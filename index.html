@@ -108,6 +108,17 @@
       text-decoration:underline;
       word-break:break-all;
     }
+    /* Links de términos dentro del texto (dieta, etc.) */
+    .term-link {
+      border: none;
+      background: none;
+      padding: 0;
+      margin: 0;
+      color: #007aff;
+      text-decoration: underline;
+      font: inherit;
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -162,6 +173,14 @@
       </p>
     </div>
 
+    <!-- Tarjeta de ayuda / explicaciones -->
+    <div id="helpCard" class="card" style="display:none;">
+      <h2>Más información</h2>
+      <div id="helpContent" class="small-note">
+        <!-- Aquí se muestra la explicación de los términos -->
+      </div>
+    </div>
+
   </div>
 
 <script>
@@ -181,6 +200,8 @@ const prepTypeSelect = document.getElementById("prepType");
 const warningEl = document.getElementById("warning");
 const timelineContainer = document.getElementById("timelineContainer");
 const exportBtn = document.getElementById("exportBtn");
+const helpCard = document.getElementById("helpCard");
+const helpContent = document.getElementById("helpContent");
 let lastEvents = [];
 
 // utilidades
@@ -193,6 +214,40 @@ function formatDateTime(date){
   });
 }
 
+// Mapeo de términos a explicaciones (podés ajustar el texto cuando tengas el protocolo fino)
+const termExplanations = {
+  "dieta_baja_residuos": `
+    <strong>Dieta baja en residuos:</strong><br>
+    • Evitar semillas, frutos secos, granos enteros, frutas y verduras crudas o con piel.<br>
+    • Preferir pan blanco, arroz blanco, pastas simples, lácteos si los tolerás, caldos colados.<br>
+    • Seguí siempre las indicaciones específicas de tu médico.
+  `,
+  "liquidos_claros": `
+    <strong>Dieta de líquidos claros:</strong><br>
+    • Agua, té, café sin leche, bebidas isotónicas claras, caldo colado sin sólidos.<br>
+    • Gelatinas claras sin colorantes rojos o azules.<br>
+    • Evitar leche, jugos con pulpa y bebidas oscuras o rojas/azules.
+  `
+  // Más adelante podemos agregar dieta blanda u otros términos
+};
+
+// Reemplaza términos en el texto por botones clickeables
+function linkifyTerms(text) {
+  let result = text;
+
+  result = result.replace(
+    /dieta baja en residuos/gi,
+    '<button type="button" class="term-link" data-term="dieta_baja_residuos">dieta baja en residuos</button>'
+  );
+
+  result = result.replace(
+    /dieta de líquidos claros/gi,
+    '<button type="button" class="term-link" data-term="liquidos_claros">dieta de líquidos claros</button>'
+  );
+
+  return result;
+}
+
 // plan PEG split (ejemplo)
 function generatePegSplitPlan(colonoDate){
   const ev=[];
@@ -201,11 +256,15 @@ function generatePegSplitPlan(colonoDate){
   const hour=colonoDate.getHours();
   const isMorning=hour<12;
 
-  ev.push({time:new Date(dayMinus3.getFullYear(),dayMinus3.getMonth(),dayMinus3.getDate(),9,0),
-           text:"Iniciar dieta baja en residuos."});
+  ev.push({
+    time:new Date(dayMinus3.getFullYear(),dayMinus3.getMonth(),dayMinus3.getDate(),9,0),
+    text:"Iniciar dieta baja en residuos."
+  });
 
-  ev.push({time:new Date(dayMinus1.getFullYear(),dayMinus1.getMonth(),dayMinus1.getDate(),9,0),
-           text:"Dieta de líquidos claros."});
+  ev.push({
+    time:new Date(dayMinus1.getFullYear(),dayMinus1.getMonth(),dayMinus1.getDate(),9,0),
+    text:"Dieta de líquidos claros."
+  });
 
   let dose1 = new Date(dayMinus1);
   dose1.setHours(isMorning?18:20, 0);
@@ -229,7 +288,7 @@ function renderTimeline(events){
   for(const e of events){
     html+=`<div class="timeline-item">
              <time>${formatDateTime(e.time)}</time>
-             <p>${e.text}</p>
+             <p>${linkifyTerms(e.text)}</p>
            </div>`;
   }
   timelineContainer.innerHTML=html;
@@ -290,6 +349,10 @@ btn.addEventListener("click",()=>{
   lastEvents=events;
   renderTimeline(events);
   exportBtn.disabled=events.length===0;
+  // al generar un nuevo plan, oculto la tarjeta de ayuda hasta que toquen un término
+  if (helpCard) {
+    helpCard.style.display = "none";
+  }
 });
 
 // botón exportar ICS
@@ -299,6 +362,20 @@ exportBtn.addEventListener("click",()=>{
     return;
   }
   downloadICS(lastEvents);
+});
+
+// Click en términos linkeados dentro del plan
+timelineContainer.addEventListener("click", (event) => {
+  const target = event.target;
+  if (target.classList && target.classList.contains("term-link")) {
+    const term = target.getAttribute("data-term");
+    const explanation = termExplanations[term];
+    if (explanation && helpCard && helpContent) {
+      helpContent.innerHTML = explanation;
+      helpCard.style.display = "block";
+      helpCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
 });
 </script>
 
