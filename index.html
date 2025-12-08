@@ -98,6 +98,16 @@
       border:1px solid #ffeeba;
       font-size:0.9rem;
     }
+    .small-note {
+      font-size: 0.85rem;
+      color:#555;
+      margin-top:4px;
+    }
+    a.safari-link {
+      color:#007aff;
+      text-decoration:underline;
+      word-break:break-all;
+    }
   </style>
 </head>
 
@@ -106,9 +116,21 @@
 
     <!-- Banner para Chrome en iPhone -->
     <div id="browserWarning" class="card banner-warning" style="display:none;">
-      <strong>Si estás en iPhone:</strong><br>
-      Para agregar el plan al calendario, abrí esta página con <b>Safari</b>.<br>
-      Si la abriste en Chrome, tocá los tres puntos (⋯) y elegí <b>"Abrir en Safari"</b>.
+      <strong>Si estás usando iPhone con Chrome:</strong>
+      <p class="small-note">
+        Para que el plan se agregue bien al calendario:
+      </p>
+      <ol class="small-note">
+        <li>Mantené presionado el siguiente enlace.</li>
+        <li>Elegí <b>"Abrir en Safari"</b>.</li>
+        <li>En Safari volvé a generar el plan y tocá “Exportar plan a calendario”.</li>
+      </ol>
+      <p class="small-note">
+        Enlace para abrir en Safari (mantené presionado):
+      </p>
+      <a class="safari-link" href="https://jfmaag92-coder.github.io/CheckColono/">
+        https://jfmaag92-coder.github.io/CheckColono/
+      </a>
     </div>
 
     <!-- Tarjeta de ingreso -->
@@ -135,6 +157,9 @@
       </div>
 
       <button id="exportBtn" disabled>Exportar plan a calendario (.ics)</button>
+      <p class="small-note">
+        Luego abrí el archivo en el calendario de tu teléfono para recibir recordatorios.
+      </p>
     </div>
 
   </div>
