@@ -6,10 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
-      font-family: system-ui, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        sans-serif;
       line-height: 1.4;
     }
-
     body {
       margin: 0;
       padding: 0;
@@ -18,14 +18,11 @@
       display: flex;
       justify-content: center;
     }
-
     .app-container {
       max-width: 480px;
       width: 100%;
       padding: 16px;
     }
-
-    /* Tarjetas */
     .card {
       background: #ffffff;
       border-radius: 16px;
@@ -33,441 +30,223 @@
       padding: 20px;
       margin-bottom: 16px;
     }
-
-    h1 {
-      font-size: 1.6rem;
-      margin: 0 0 4px 0;
-    }
-
-    h2 {
-      margin-top: 0;
-    }
-
-    /* Subtítulo debajo del título principal */
-    .app-subtitle {
-      margin: 0;
-      font-size: 0.9rem;
-      color: #6b7280; /* gris suave */
-      font-weight: 500;
-    }
-
-    label {
-      display: block;
-      font-size: 0.9rem;
-      margin-bottom: 4px;
+    h1, h2 {
+      margin: 0 0 12px 0;
       font-weight: 600;
     }
 
-    /* Inputs */
-    input, select, button {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-size: 0.95rem;
-      margin-bottom: 12px;
-    }
+    /* ---------- PLAN DE PREPARACIÓN ---------- */
 
-    button {
-      border: none;
-      cursor: pointer;
-      background: #007aff;
-      color: #fff;
-      font-weight: 600;
-    }
-
-    #exportBtn {
-      background: #e5f0ff;
-      color: #0050aa;
-      margin-top: 10px;
-    }
-
-    #exportBtn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .warning {
-      font-size: 0.85rem;
-      color: #b00020;
-      margin-top: 4px;
-    }
-
-    /* TIMELINE moderno estilo iOS */
-    #timelineContainer {
-      position: relative;
+    .prep-steps {
       margin-top: 8px;
-      padding-left: 18px;
+      position: relative;
     }
 
-    /* Línea vertical suave */
-    #timelineContainer::before {
+    /* línea vertical del timeline */
+    .prep-steps::before {
       content: "";
       position: absolute;
-      left: 4px;
+      left: 10px;
       top: 4px;
       bottom: 4px;
       width: 2px;
-      background: linear-gradient(to bottom, #e0e7ff, transparent);
+      background: #e1e5f0;
     }
 
-    .timeline-item {
-      position: relative;
+    .prep-step {
       margin-bottom: 16px;
+      padding-left: 28px;
+      position: relative;
     }
 
-    /* Punto con halo suave */
-    .timeline-item::before {
+    /* punto azul */
+    .prep-step::before {
       content: "";
       position: absolute;
-      left: -14px;
-      top: 8px;
+      left: 5px;
+      top: 4px;
       width: 10px;
       height: 10px;
       border-radius: 999px;
-      background: #1e88e5;
-      box-shadow: 0 0 0 3px #e3f2fd;
+      background: #0b6eff;
+      box-shadow: 0 0 0 3px rgba(11,110,255,0.2);
     }
 
-    .timeline-item time {
-      font-size: 0.8rem;
-      color: #6b7280;
-      text-transform: lowercase;
-      letter-spacing: 0.02em;
-      display: block;
+    .prep-time {
+      font-size: 0.9rem;
+      color: #666;
       margin-bottom: 2px;
     }
 
-    .timeline-item p {
-      margin: 0;
-      font-size: 0.95rem;
-      color: #111827;
+    .prep-desc {
+      font-size: 1rem;
+      color: #222;
+      line-height: 1.35;
     }
 
-    /* LINKS DE TÉRMINOS (estilo discreto) */
-    .term-link {
+    /* estilo discreto del link EN LÍNEA */
+    .prep-desc a,
+    .inline-link {
+      display: inline;              /* clave para que no baje de renglón */
+      color: #0066cc;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-weight: 500;
+    }
+
+    .inline-link:hover {
+      opacity: 0.8;
+    }
+
+    .plan-footer {
+      margin-top: 20px;
+    }
+
+    .export-btn {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
       border: none;
-      background: none;
-      padding: 0;
-      margin: 0;
-      font: inherit;
-      color: #007aff;
+      background: #e6f0ff;
+      color: #0052cc;
+      font-weight: 600;
+      text-align: center;
       cursor: pointer;
     }
 
-    .term-link:hover,
-    .term-link:focus {
-      text-decoration: underline;
-    }
-
-    /* Banner para Chrome en iPhone */
-    .banner-warning {
-      background: #fff3cd;
-      border: 1px solid #ffeeba;
-      font-size: 0.9rem;
-    }
-
-    .small-note {
-      font-size: 0.85rem;
-      color:#555;
-      margin-top:4px;
-    }
-
-    a.safari-link {
-      color:#007aff;
-      text-decoration:underline;
-      word-break:break-all;
+    .export-btn:active {
+      transform: scale(0.98);
     }
   </style>
 </head>
-
 <body>
   <div class="app-container">
 
-    <!-- Banner para Chrome en iPhone -->
-    <div id="browserWarning" class="card banner-warning" style="display:none;">
-      <strong>Si estás usando iPhone con Chrome:</strong>
-      <p class="small-note">Para que el plan se agregue bien al calendario:</p>
-      <ol class="small-note">
-        <li>Mantené presionado el siguiente enlace.</li>
-        <li>Elegí <b>"Abrir en Safari"</b>.</li>
-        <li>En Safari volvé a generar el plan y tocá “Exportar plan a calendario”.</li>
-      </ol>
-      <p class="small-note">Enlace para abrir en Safari:</p>
-      <a class="safari-link" href="https://jfmaag92-coder.github.io/CheckColono/">
-        https://jfmaag92-coder.github.io/CheckColono/
-      </a>
-    </div>
+    <!-- otras cards de arriba (selector de esquema, botón Generar, etc.) -->
 
-    <!-- Tarjeta de ingreso -->
-    <div class="card">
-      <h1>CheckColono</h1>
-      <p class="app-subtitle">Dra. Evelin Crocci</p>
-
-      <label>Fecha y hora del estudio</label>
-      <input id="datetime" type="datetime-local">
-
-      <label>Tipo de preparación</label>
-      <select id="prepType">
-        <option value="peg_split">PEG en dosis divididas (ejemplo)</option>
-      </select>
-
-      <button id="generateBtn">Generar plan</button>
-      <div id="warning" class="warning"></div>
-    </div>
-
-    <!-- Tarjeta del plan -->
-    <div class="card">
+    <div class="card" id="plan-card" style="display:none;">
       <h2>Tu plan de preparación</h2>
-      <div id="timelineContainer">
-        <p>Ingresá los datos y generá el plan.</p>
+      <div id="prep-steps" class="prep-steps"></div>
+
+      <div class="plan-footer">
+        <button class="export-btn" id="export-ics">
+          Exportar plan a calendario (.ics)
+        </button>
       </div>
-
-      <button id="exportBtn" disabled>Exportar plan a calendario (.ics)</button>
-      <p class="small-note">
-        Luego abrí el archivo en el calendario de tu teléfono para recibir recordatorios.
-      </p>
     </div>
-
-    <!-- Tarjeta de ayuda -->
-    <div id="helpCard" class="card" style="display:none;">
-      <h2>Más información</h2>
-      <div id="helpContent" class="small-note"></div>
-    </div>
-
   </div>
 
-<script>
-/* -------------------------
-   HAPTIC FEEDBACK
-   (Android lo usa, iOS lo suele ignorar sin error)
---------------------------*/
-function hapticLight() {
-  if (navigator.vibrate) {
-    navigator.vibrate(15); // pequeña vibración suave
-  }
-}
+  <script>
+    // --------- EJEMPLO DE GENERACIÓN DEL PLAN ---------
+    // Supongamos que ya calculaste las fechas/horas y armaste este array:
+    // textBefore = lo que va antes del link
+    // linkText / linkHref = link
+    // textAfter = lo que va después (ej: el punto final)
 
-/* -------------------------
-   DETECTAR iPHONE + CHROME
---------------------------*/
-const ua = navigator.userAgent || navigator.vendor || window.opera || "";
-const isIOS = /iPad|iPhone|iPod/.test(ua);
-const isChromeIOS = isIOS && /CriOS/.test(ua);
-const browserWarning = document.getElementById("browserWarning");
-if (isChromeIOS && browserWarning) browserWarning.style.display = "block";
+    const examplePlan = [
+      {
+        datetime: new Date(2025, 11, 14, 9, 0), // ojo: mes 11 = diciembre
+        textBefore: "Iniciar ",
+        linkText: "dieta baja en residuos",
+        linkHref: "#",
+        textAfter: "."
+      },
+      {
+        datetime: new Date(2025, 11, 16, 9, 0),
+        textBefore: "Iniciar ",
+        linkText: "dieta de líquidos claros",
+        linkHref: "#",
+        textAfter: "."
+      },
+      {
+        datetime: new Date(2025, 11, 16, 20, 0),
+        text: "Primera dosis de solución de PEG."
+      },
+      {
+        datetime: new Date(2025, 11, 17, 13, 7),
+        text: "Iniciar ayuno de sólidos."
+      },
+      {
+        datetime: new Date(2025, 11, 17, 14, 7),
+        text: "Segunda dosis de solución de PEG."
+      },
+      {
+        datetime: new Date(2025, 11, 17, 17, 7),
+        text: "Presentarse en el centro médico."
+      }
+    ];
 
-/* -------------------------
-   REFERENCIAS DOM
---------------------------*/
-const btn = document.getElementById("generateBtn");
-const datetimeInput = document.getElementById("datetime");
-const prepTypeSelect = document.getElementById("prepType");
-const warningEl = document.getElementById("warning");
-const timelineContainer = document.getElementById("timelineContainer");
-const exportBtn = document.getElementById("exportBtn");
-const helpCard = document.getElementById("helpCard");
-const helpContent = document.getElementById("helpContent");
-let lastEvents = [];
+    function formatDateTime(date) {
+      // formato corto parecido al de iOS: "mié 17-12, 05:07 p. m."
+      const dias = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
+      const dia = dias[date.getDay()];
+      const dd = String(date.getDate()).padStart(2, "0");
+      const mm = String(date.getMonth() + 1).padStart(2, "0");
 
-/* -------------------------
-   UTILIDADES
---------------------------*/
-function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
-function addHours(d,n){ const x=new Date(d); x.setHours(x.getHours()+n); return x; }
-function formatDateTime(date){
-  return date.toLocaleString("es-AR",{
-    weekday:"short", day:"2-digit", month:"2-digit",
-    hour:"2-digit", minute:"2-digit"
-  });
-}
+      let hours = date.getHours();
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      const isPM = hours >= 12;
+      let label = isPM ? "p. m." : "a. m.";
+      hours = hours % 12;
+      if (hours === 0) hours = 12;
 
-/* -------------------------
-   EXPLICACIONES DE TÉRMINOS
---------------------------*/
-const termExplanations = {
-  "dieta_baja_residuos": `
-    <strong>Dieta baja en residuos:</strong><br>
-    • Evitar semillas, frutos secos, granos enteros, frutas y verduras crudas.<br>
-    • Preferir pan blanco, arroz blanco, pastas simples, caldos colados.<br>
-    • Seguir siempre indicaciones del equipo médico.
-  `,
-  "liquidos_claros": `
-    <strong>Dieta de líquidos claros:</strong><br>
-    • Agua, té, café sin leche, bebidas claras, caldo colado.<br>
-    • Gelatinas claras sin colorantes rojos o azules.<br>
-    • Evitar leche, jugos con pulpa y bebidas oscuras.
-  `
-};
-
-/* Reemplaza términos por botones clickeables */
-function linkifyTerms(text){
-  return text
-    .replace(/dieta baja en residuos/gi,
-      '<button type="button" class="term-link" data-term="dieta_baja_residuos">dieta baja en residuos</button>')
-    .replace(/dieta de líquidos claros/gi,
-      '<button type="button" class="term-link" data-term="liquidos_claros">dieta de líquidos claros</button>');
-}
-
-/* -------------------------
-   PLAN PEG SPLIT
---------------------------*/
-function generatePegSplitPlan(colonoDate){
-  const ev=[];
-  const dayMinus3 = addDays(colonoDate,-3);
-  const dayMinus1 = addDays(colonoDate,-1);
-
-  const hour = colonoDate.getHours();
-  const isMorning = hour < 12;
-
-  ev.push({
-    time:new Date(dayMinus3.getFullYear(),dayMinus3.getMonth(),dayMinus3.getDate(),9,0),
-    text:"Iniciar dieta baja en residuos."
-  });
-
-  ev.push({
-    time:new Date(dayMinus1.getFullYear(),dayMinus1.getMonth(),dayMinus1.getDate(),9,0),
-    text:"Dieta de líquidos claros."
-  });
-
-  let dose1=new Date(dayMinus1);
-  dose1.setHours(isMorning?18:20,0);
-  ev.push({time:dose1, text:"Primera dosis de solución de PEG."});
-
-  ev.push({time:addHours(colonoDate,-5), text:"Segunda dosis de solución de PEG."});
-  ev.push({time:addHours(colonoDate,-6), text:"Iniciar ayuno de sólidos."});
-  ev.push({time:addHours(colonoDate,-1.5), text:"Presentarse en el centro médico."});
-
-  ev.sort((a,b)=>a.time-b.time);
-  return ev;
-}
-
-/* -------------------------
-   RENDER DEL TIMELINE
---------------------------*/
-function renderTimeline(events){
-  if(!events.length){
-    timelineContainer.innerHTML="<p>No hay eventos.</p>";
-    return;
-  }
-  let html="";
-  for(const e of events){
-    html += `
-      <div class="timeline-item">
-        <time>${formatDateTime(e.time)}</time>
-        <p>${linkifyTerms(e.text)}</p>
-      </div>`;
-  }
-  timelineContainer.innerHTML = html;
-}
-
-/* -------------------------
-   ICS
---------------------------*/
-function toICSDate(date){
-  const y=date.getFullYear();
-  const m=String(date.getMonth()+1).padStart(2,"0");
-  const d=String(date.getDate()).padStart(2,"0");
-  const h=String(date.getHours()).padStart(2,"0");
-  const min=String(date.getMinutes()).padStart(2,"0");
-  return `${y}${m}${d}T${h}${min}00`;
-}
-
-function generateICS(events){
-  let ics="BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//CheckColono//ES\r\n";
-  const now=new Date();
-  const dtstamp=toICSDate(now);
-
-  events.forEach((ev,i)=>{
-    const st=toICSDate(ev.time);
-    const en=toICSDate(new Date(ev.time.getTime()+30*60000));
-    const uid=`checkcolono-${dtstamp}-${i}`;
-    const summary=ev.text.split(".")[0];
-
-    ics+=`
-BEGIN:VEVENT
-UID:${uid}
-DTSTAMP:${dtstamp}
-DTSTART:${st}
-DTEND:${en}
-SUMMARY:${summary}
-DESCRIPTION:${ev.text}
-BEGIN:VALARM
-TRIGGER:-PT60M
-ACTION:DISPLAY
-DESCRIPTION:Recordatorio CheckColono
-END:VALARM
-END:VEVENT
-`.replace(/^\s+/gm, "");
-  });
-
-  return ics + "END:VCALENDAR\r\n";
-}
-
-function downloadICS(events){
-  const file=generateICS(events);
-  const blob=new Blob([file],{type:"text/calendar"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url;
-  a.download="checkcolono-plan.ics";
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-/* -------------------------
-   EVENTOS DE BOTONES
---------------------------*/
-btn.addEventListener("click",()=>{
-  hapticLight();  // feedback al generar plan
-
-  warningEl.textContent="";
-  const val=datetimeInput.value;
-  if(!val){
-    warningEl.textContent="Ingresá fecha y hora.";
-    return;
-  }
-
-  const date=new Date(val);
-  let events=[];
-  if(prepTypeSelect.value==="peg_split"){
-    events = generatePegSplitPlan(date);
-  }
-
-  lastEvents = events;
-  renderTimeline(events);
-  exportBtn.disabled = events.length === 0;
-
-  helpCard.style.display = "none";
-});
-
-exportBtn.addEventListener("click",()=>{
-  hapticLight();  // feedback al exportar
-
-  if(!lastEvents.length){
-    alert("Primero generá un plan.");
-    return;
-  }
-  downloadICS(lastEvents);
-});
-
-/* Click en términos linkeados */
-timelineContainer.addEventListener("click",(event)=>{
-  const target=event.target;
-  if(target.classList.contains("term-link")){
-    hapticLight();  // feedback al abrir explicación
-
-    const term = target.getAttribute("data-term");
-    const explanation = termExplanations[term];
-    if (explanation){
-      helpContent.innerHTML = explanation;
-      helpCard.style.display = "block";
-      helpCard.scrollIntoView({behavior:"smooth"});
+      return `${dia} ${dd}-${mm}, ${hours}:${minutes} ${label}`;
     }
-  }
-});
-</script>
 
+    function renderPlan(steps) {
+      const container = document.getElementById("prep-steps");
+      container.innerHTML = "";
+
+      steps.forEach(step => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "prep-step";
+
+        const timeEl = document.createElement("div");
+        timeEl.className = "prep-time";
+        timeEl.textContent = formatDateTime(step.datetime);
+
+        const descEl = document.createElement("div");
+        descEl.className = "prep-desc";
+
+        if (step.linkText && step.linkHref) {
+          if (step.textBefore) {
+            descEl.appendChild(
+              document.createTextNode(step.textBefore)
+            );
+          }
+
+          const a = document.createElement("a");
+          a.href = step.linkHref;
+          a.className = "inline-link";
+          a.textContent = step.linkText;
+          descEl.appendChild(a);
+
+          if (step.textAfter) {
+            descEl.appendChild(
+              document.createTextNode(step.textAfter)
+            );
+          }
+        } else {
+          descEl.textContent = step.text;
+        }
+
+        wrapper.appendChild(timeEl);
+        wrapper.appendChild(descEl);
+        container.appendChild(wrapper);
+      });
+
+      // Mostrar la card
+      document.getElementById("plan-card").style.display = "block";
+    }
+
+    // Llamás a esto cuando el usuario toca "Generar plan"
+    renderPlan(examplePlan);
+
+    // acá iría tu lógica real de exportar ICS
+    document.getElementById("export-ics").addEventListener("click", () => {
+      alert("Acá va la generación del .ics 🙂");
+    });
+  </script>
 </body>
 </html>
