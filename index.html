@@ -9,6 +9,7 @@
       font-family: system-ui, sans-serif;
       line-height: 1.4;
     }
+
     body {
       margin: 0;
       padding: 0;
@@ -17,11 +18,14 @@
       display: flex;
       justify-content: center;
     }
+
     .app-container {
       max-width: 480px;
       width: 100%;
       padding: 16px;
     }
+
+    /* Tarjetas */
     .card {
       background: #ffffff;
       border-radius: 16px;
@@ -29,16 +33,24 @@
       padding: 20px;
       margin-bottom: 16px;
     }
+
     h1 {
       font-size: 1.6rem;
       margin: 0 0 4px 0;
     }
+
+    h2 {
+      margin-top: 0;
+    }
+
     label {
       display: block;
       font-size: 0.9rem;
       margin-bottom: 4px;
       font-weight: 600;
     }
+
+    /* Inputs */
     input, select, button {
       width: 100%;
       box-sizing: border-box;
@@ -48,6 +60,7 @@
       font-size: 0.95rem;
       margin-bottom: 12px;
     }
+
     button {
       border: none;
       cursor: pointer;
@@ -55,121 +68,88 @@
       color: #fff;
       font-weight: 600;
     }
+
     #exportBtn {
       background: #e5f0ff;
       color: #0050aa;
       margin-top: 10px;
     }
+
     #exportBtn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
+
     .warning {
       font-size: 0.85rem;
       color: #b00020;
       margin-top: 4px;
     }
-    .prep-step-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
 
-.prep-step {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.prep-step-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: #1e88e5;
-  margin-top: 6px;
-  flex-shrink: 0;
-}
-
-.prep-step-content {
-  flex: 1;
-}
-
-.prep-step-datetime {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #555;
-  margin-bottom: 2px;
-}
-
-.prep-step-text {
-  margin: 0;
-  font-size: 0.95rem;
-  color: #222;
-}
-
-/* Link discreto, integrado al texto */
-.prep-step-link {
-  color: #0066cc;
-  font-weight: 500;
-  text-decoration: none;
-  text-underline-offset: 2px;
-}
-
-.prep-step-link:hover,
-.prep-step-link:focus {
-  text-decoration: underline;
-}
-
+    /* TIMELINE limpio */
     .timeline-item {
-      margin-bottom: 12px;
-      padding-left: 16px;
+      margin-bottom: 14px;
+      padding-left: 18px;
       position: relative;
     }
+
     .timeline-item::before {
-      content:"";
+      content: "";
       position: absolute;
       left: 0;
-      top: 5px;
+      top: 6px;
       width: 8px;
       height: 8px;
-      background:#007aff;
-      border-radius:50%;
+      background: #1e88e5;
+      border-radius: 50%;
     }
+
     .timeline-item time {
-      font-size: 0.9rem;
-      color: #555;
-      display:block;
-    }
-    .timeline-item p {
-      margin: 2px 0 0 0;
-      font-size: 0.95rem;
-    }
-    .banner-warning {
-      background:#fff3cd;
-      border:1px solid #ffeeba;
-      font-size:0.9rem;
-    }
-    .small-note {
       font-size: 0.85rem;
-      color:#555;
-      margin-top:4px;
+      color: #555;
+      display: block;
+      margin-bottom: 2px;
     }
-    a.safari-link {
-      color:#007aff;
-      text-decoration:underline;
-      word-break:break-all;
+
+    .timeline-item p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #222;
     }
-    /* Links de términos dentro del texto (dieta, etc.) */
+
+    /* LINKS DE TÉRMINOS (estilo discreto) */
     .term-link {
       border: none;
       background: none;
       padding: 0;
       margin: 0;
-      color: #007aff;
-      text-decoration: underline;
       font: inherit;
+      color: #007aff;
       cursor: pointer;
+    }
+
+    .term-link:hover,
+    .term-link:focus {
+      text-decoration: underline;
+    }
+
+    /* Banner para Chrome en iPhone */
+    .banner-warning {
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      font-size: 0.9rem;
+    }
+
+    .small-note {
+      font-size: 0.85rem;
+      color:#555;
+      margin-top:4px;
+    }
+
+    a.safari-link {
+      color:#007aff;
+      text-decoration:underline;
+      word-break:break-all;
     }
   </style>
 </head>
@@ -180,17 +160,13 @@
     <!-- Banner para Chrome en iPhone -->
     <div id="browserWarning" class="card banner-warning" style="display:none;">
       <strong>Si estás usando iPhone con Chrome:</strong>
-      <p class="small-note">
-        Para que el plan se agregue bien al calendario:
-      </p>
+      <p class="small-note">Para que el plan se agregue bien al calendario:</p>
       <ol class="small-note">
         <li>Mantené presionado el siguiente enlace.</li>
         <li>Elegí <b>"Abrir en Safari"</b>.</li>
         <li>En Safari volvé a generar el plan y tocá “Exportar plan a calendario”.</li>
       </ol>
-      <p class="small-note">
-        Enlace para abrir en Safari (mantené presionado):
-      </p>
+      <p class="small-note">Enlace para abrir en Safari:</p>
       <a class="safari-link" href="https://jfmaag92-coder.github.io/CheckColono/">
         https://jfmaag92-coder.github.io/CheckColono/
       </a>
@@ -225,27 +201,27 @@
       </p>
     </div>
 
-    <!-- Tarjeta de ayuda / explicaciones -->
+    <!-- Tarjeta de ayuda -->
     <div id="helpCard" class="card" style="display:none;">
       <h2>Más información</h2>
-      <div id="helpContent" class="small-note">
-        <!-- Aquí se muestra la explicación de los términos -->
-      </div>
+      <div id="helpContent" class="small-note"></div>
     </div>
 
   </div>
 
 <script>
-// detectar iPhone + Chrome
+/* -------------------------
+   DETECTAR iPHONE + CHROME
+--------------------------*/
 const ua = navigator.userAgent || navigator.vendor || window.opera || "";
 const isIOS = /iPad|iPhone|iPod/.test(ua);
-const isChromeIOS = isIOS && /CriOS/.test(ua); // "CriOS" = Chrome en iOS
+const isChromeIOS = isIOS && /CriOS/.test(ua);
 const browserWarning = document.getElementById("browserWarning");
-if (isChromeIOS && browserWarning) {
-  browserWarning.style.display = "block";
-}
+if (isChromeIOS && browserWarning) browserWarning.style.display = "block";
 
-// referencias DOM
+/* -------------------------
+   REFERENCIAS DOM
+--------------------------*/
 const btn = document.getElementById("generateBtn");
 const datetimeInput = document.getElementById("datetime");
 const prepTypeSelect = document.getElementById("prepType");
@@ -256,9 +232,11 @@ const helpCard = document.getElementById("helpCard");
 const helpContent = document.getElementById("helpContent");
 let lastEvents = [];
 
-// utilidades
-function addDays(d, n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
-function addHours(d, n){ const x=new Date(d); x.setHours(x.getHours()+n); return x; }
+/* -------------------------
+   UTILIDADES
+--------------------------*/
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function addHours(d,n){ const x=new Date(d); x.setHours(x.getHours()+n); return x; }
 function formatDateTime(date){
   return date.toLocaleString("es-AR",{
     weekday:"short", day:"2-digit", month:"2-digit",
@@ -266,47 +244,43 @@ function formatDateTime(date){
   });
 }
 
-// Mapeo de términos a explicaciones (podés ajustar el texto cuando tengas el protocolo fino)
+/* -------------------------
+   EXPLICACIONES DE TÉRMINOS
+--------------------------*/
 const termExplanations = {
   "dieta_baja_residuos": `
     <strong>Dieta baja en residuos:</strong><br>
-    • Evitar semillas, frutos secos, granos enteros, frutas y verduras crudas o con piel.<br>
-    • Preferir pan blanco, arroz blanco, pastas simples, lácteos si los tolerás, caldos colados.<br>
-    • Seguí siempre las indicaciones específicas de tu médico.
+    • Evitar semillas, frutos secos, granos enteros, frutas y verduras crudas.<br>
+    • Preferir pan blanco, arroz blanco, pastas simples, caldos colados.<br>
+    • Seguir siempre indicaciones del equipo médico.
   `,
   "liquidos_claros": `
     <strong>Dieta de líquidos claros:</strong><br>
-    • Agua, té, café sin leche, bebidas isotónicas claras, caldo colado sin sólidos.<br>
+    • Agua, té, café sin leche, bebidas claras, caldo colado.<br>
     • Gelatinas claras sin colorantes rojos o azules.<br>
-    • Evitar leche, jugos con pulpa y bebidas oscuras o rojas/azules.
+    • Evitar leche, jugos con pulpa y bebidas oscuras.
   `
-  // Más adelante podemos agregar dieta blanda u otros términos
 };
 
-// Reemplaza términos en el texto por botones clickeables
-function linkifyTerms(text) {
-  let result = text;
-
-  result = result.replace(
-    /dieta baja en residuos/gi,
-    '<button type="button" class="term-link" data-term="dieta_baja_residuos">dieta baja en residuos</button>'
-  );
-
-  result = result.replace(
-    /dieta de líquidos claros/gi,
-    '<button type="button" class="term-link" data-term="liquidos_claros">dieta de líquidos claros</button>'
-  );
-
-  return result;
+/* Reemplaza términos por botones clickeables */
+function linkifyTerms(text){
+  return text
+    .replace(/dieta baja en residuos/gi,
+      '<button type="button" class="term-link" data-term="dieta_baja_residuos">dieta baja en residuos</button>')
+    .replace(/dieta de líquidos claros/gi,
+      '<button type="button" class="term-link" data-term="liquidos_claros">dieta de líquidos claros</button>');
 }
 
-// plan PEG split (ejemplo)
+/* -------------------------
+   PLAN PEG SPLIT
+--------------------------*/
 function generatePegSplitPlan(colonoDate){
   const ev=[];
-  const dayMinus3=addDays(colonoDate,-3);
-  const dayMinus1=addDays(colonoDate,-1);
-  const hour=colonoDate.getHours();
-  const isMorning=hour<12;
+  const dayMinus3 = addDays(colonoDate,-3);
+  const dayMinus1 = addDays(colonoDate,-1);
+
+  const hour = colonoDate.getHours();
+  const isMorning = hour < 12;
 
   ev.push({
     time:new Date(dayMinus3.getFullYear(),dayMinus3.getMonth(),dayMinus3.getDate(),9,0),
@@ -318,8 +292,8 @@ function generatePegSplitPlan(colonoDate){
     text:"Dieta de líquidos claros."
   });
 
-  let dose1 = new Date(dayMinus1);
-  dose1.setHours(isMorning?18:20, 0);
+  let dose1=new Date(dayMinus1);
+  dose1.setHours(isMorning?18:20,0);
   ev.push({time:dose1, text:"Primera dosis de solución de PEG."});
 
   ev.push({time:addHours(colonoDate,-5), text:"Segunda dosis de solución de PEG."});
@@ -330,7 +304,9 @@ function generatePegSplitPlan(colonoDate){
   return ev;
 }
 
-// renderizar plan
+/* -------------------------
+   RENDER DEL TIMELINE
+--------------------------*/
 function renderTimeline(events){
   if(!events.length){
     timelineContainer.innerHTML="<p>No hay eventos.</p>";
@@ -338,15 +314,18 @@ function renderTimeline(events){
   }
   let html="";
   for(const e of events){
-    html+=`<div class="timeline-item">
-             <time>${formatDateTime(e.time)}</time>
-             <p>${linkifyTerms(e.text)}</p>
-           </div>`;
+    html += `
+      <div class="timeline-item">
+        <time>${formatDateTime(e.time)}</time>
+        <p>${linkifyTerms(e.text)}</p>
+      </div>`;
   }
-  timelineContainer.innerHTML=html;
+  timelineContainer.innerHTML = html;
 }
 
-// ICS helpers
+/* -------------------------
+   ICS
+--------------------------*/
 function toICSDate(date){
   const y=date.getFullYear();
   const m=String(date.getMonth()+1).padStart(2,"0");
@@ -367,10 +346,24 @@ function generateICS(events){
     const uid=`checkcolono-${dtstamp}-${i}`;
     const summary=ev.text.split(".")[0];
 
-    ics+=`BEGIN:VEVENT\r\nUID:${uid}\r\nDTSTAMP:${dtstamp}\r\nDTSTART:${st}\r\nDTEND:${en}\r\nSUMMARY:${summary}\r\nDESCRIPTION:${ev.text}\r\nBEGIN:VALARM\r\nTRIGGER:-PT60M\r\nACTION:DISPLAY\r\nDESCRIPTION:Recordatorio CheckColono\r\nEND:VALARM\r\nEND:VEVENT\r\n`;
+    ics+=`
+BEGIN:VEVENT
+UID:${uid}
+DTSTAMP:${dtstamp}
+DTSTART:${st}
+DTEND:${en}
+SUMMARY:${summary}
+DESCRIPTION:${ev.text}
+BEGIN:VALARM
+TRIGGER:-PT60M
+ACTION:DISPLAY
+DESCRIPTION:Recordatorio CheckColono
+END:VALARM
+END:VEVENT
+`.replace(/^\s+/gm, "");
   });
 
-  return ics+"END:VCALENDAR\r\n";
+  return ics + "END:VCALENDAR\r\n";
 }
 
 function downloadICS(events){
@@ -384,7 +377,9 @@ function downloadICS(events){
   URL.revokeObjectURL(url);
 }
 
-// botón generar
+/* -------------------------
+   EVENTOS DE BOTONES
+--------------------------*/
 btn.addEventListener("click",()=>{
   warningEl.textContent="";
   const val=datetimeInput.value;
@@ -395,19 +390,17 @@ btn.addEventListener("click",()=>{
 
   const date=new Date(val);
   let events=[];
-  if (prepTypeSelect.value === "peg_split") {
-    events=generatePegSplitPlan(date);
+  if(prepTypeSelect.value==="peg_split"){
+    events = generatePegSplitPlan(date);
   }
-  lastEvents=events;
+
+  lastEvents = events;
   renderTimeline(events);
-  exportBtn.disabled=events.length===0;
-  // al generar un nuevo plan, oculto la tarjeta de ayuda hasta que toquen un término
-  if (helpCard) {
-    helpCard.style.display = "none";
-  }
+  exportBtn.disabled = events.length === 0;
+
+  helpCard.style.display = "none";
 });
 
-// botón exportar ICS
 exportBtn.addEventListener("click",()=>{
   if(!lastEvents.length){
     alert("Primero generá un plan.");
@@ -416,16 +409,16 @@ exportBtn.addEventListener("click",()=>{
   downloadICS(lastEvents);
 });
 
-// Click en términos linkeados dentro del plan
-timelineContainer.addEventListener("click", (event) => {
-  const target = event.target;
-  if (target.classList && target.classList.contains("term-link")) {
+/* Click en términos linkeados */
+timelineContainer.addEventListener("click",(event)=>{
+  const target=event.target;
+  if(target.classList.contains("term-link")){
     const term = target.getAttribute("data-term");
     const explanation = termExplanations[term];
-    if (explanation && helpCard && helpContent) {
+    if (explanation){
       helpContent.innerHTML = explanation;
       helpCard.style.display = "block";
-      helpCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      helpCard.scrollIntoView({behavior:"smooth"});
     }
   }
 });
@@ -433,4 +426,3 @@ timelineContainer.addEventListener("click", (event) => {
 
 </body>
 </html>
-
