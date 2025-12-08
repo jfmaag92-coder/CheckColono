@@ -118,6 +118,15 @@ const warningEl = document.getElementById("warning");
 const timelineContainer = document.getElementById("timelineContainer");
 const exportBtn = document.getElementById("exportBtn");
 let lastEvents = [];
+const browserWarning = document.getElementById("browserWarning");
+const ua = navigator.userAgent || "";
+const isIOS = /iPad|iPhone|iPod/.test(ua);
+const isChromeIOS = isIOS && /CriOS/.test(ua); // Chrome en iOS
+
+if (isChromeIOS && browserWarning) {
+  browserWarning.style.display = "block";
+}
+
 
 // utilidades
 function addDays(d, n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
