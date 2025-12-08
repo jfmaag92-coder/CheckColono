@@ -82,6 +82,15 @@
 <body>
   <div class="app-container">
 
+    <!-- Advertencia para Chrome en iPhone -->
+<div id="browserWarning" class="card" 
+     style="display:none; background:#fff3cd; border:1px solid #ffeeba; margin-bottom:16px;">
+  <strong>Si estás en iPhone:</strong><br>
+  Para agregar el plan al calendario, abrí esta página con <b>Safari</b>.<br>
+  Si estás usando Chrome, tocá ⋯ → <b>"Abrir en Safari"</b>.
+</div>
+
+
     <!-- Tarjeta de ingreso -->
     <div class="card">
       <h1>CheckColono</h1>
@@ -118,6 +127,7 @@ const warningEl = document.getElementById("warning");
 const timelineContainer = document.getElementById("timelineContainer");
 const exportBtn = document.getElementById("exportBtn");
 let lastEvents = [];
+// Detectar Chrome en iPhone y mostrar aviso
 const browserWarning = document.getElementById("browserWarning");
 const ua = navigator.userAgent || "";
 const isIOS = /iPad|iPhone|iPod/.test(ua);
@@ -125,6 +135,8 @@ const isChromeIOS = isIOS && /CriOS/.test(ua); // Chrome en iOS
 
 if (isChromeIOS && browserWarning) {
   browserWarning.style.display = "block";
+}
+
 }
 
 
@@ -238,3 +250,4 @@ exportBtn.addEventListener("click",()=>{
 
 </body>
 </html>
+
