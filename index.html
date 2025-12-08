@@ -43,6 +43,14 @@
       margin-top: 0;
     }
 
+    /* Subtítulo debajo del título principal */
+    .app-subtitle {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #6b7280; /* gris suave */
+      font-weight: 500;
+    }
+
     label {
       display: block;
       font-size: 0.9rem;
@@ -86,27 +94,47 @@
       margin-top: 4px;
     }
 
-    /* TIMELINE limpio */
-    .timeline-item {
-      margin-bottom: 14px;
-      padding-left: 18px;
+    /* TIMELINE moderno estilo iOS */
+    #timelineContainer {
       position: relative;
+      margin-top: 8px;
+      padding-left: 18px;
     }
 
+    /* Línea vertical suave */
+    #timelineContainer::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 4px;
+      bottom: 4px;
+      width: 2px;
+      background: linear-gradient(to bottom, #e0e7ff, transparent);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    /* Punto con halo suave */
     .timeline-item::before {
       content: "";
       position: absolute;
-      left: 0;
-      top: 6px;
-      width: 8px;
-      height: 8px;
+      left: -14px;
+      top: 8px;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
       background: #1e88e5;
-      border-radius: 50%;
+      box-shadow: 0 0 0 3px #e3f2fd;
     }
 
     .timeline-item time {
-      font-size: 0.85rem;
-      color: #555;
+      font-size: 0.8rem;
+      color: #6b7280;
+      text-transform: lowercase;
+      letter-spacing: 0.02em;
       display: block;
       margin-bottom: 2px;
     }
@@ -114,7 +142,7 @@
     .timeline-item p {
       margin: 0;
       font-size: 0.95rem;
-      color: #222;
+      color: #111827;
     }
 
     /* LINKS DE TÉRMINOS (estilo discreto) */
@@ -175,6 +203,7 @@
     <!-- Tarjeta de ingreso -->
     <div class="card">
       <h1>CheckColono</h1>
+      <p class="app-subtitle">Dra. Evelin Crocci</p>
 
       <label>Fecha y hora del estudio</label>
       <input id="datetime" type="datetime-local">
@@ -210,6 +239,16 @@
   </div>
 
 <script>
+/* -------------------------
+   HAPTIC FEEDBACK
+   (Android lo usa, iOS lo suele ignorar sin error)
+--------------------------*/
+function hapticLight() {
+  if (navigator.vibrate) {
+    navigator.vibrate(15); // pequeña vibración suave
+  }
+}
+
 /* -------------------------
    DETECTAR iPHONE + CHROME
 --------------------------*/
@@ -381,6 +420,8 @@ function downloadICS(events){
    EVENTOS DE BOTONES
 --------------------------*/
 btn.addEventListener("click",()=>{
+  hapticLight();  // feedback al generar plan
+
   warningEl.textContent="";
   const val=datetimeInput.value;
   if(!val){
@@ -402,6 +443,8 @@ btn.addEventListener("click",()=>{
 });
 
 exportBtn.addEventListener("click",()=>{
+  hapticLight();  // feedback al exportar
+
   if(!lastEvents.length){
     alert("Primero generá un plan.");
     return;
@@ -413,6 +456,8 @@ exportBtn.addEventListener("click",()=>{
 timelineContainer.addEventListener("click",(event)=>{
   const target=event.target;
   if(target.classList.contains("term-link")){
+    hapticLight();  // feedback al abrir explicación
+
     const term = target.getAttribute("data-term");
     const explanation = termExplanations[term];
     if (explanation){
