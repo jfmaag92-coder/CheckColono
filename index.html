@@ -29,6 +29,19 @@
       box-sizing: border-box;
     }
 
+    /* BANNER PARA CHROME EN iOS */
+    .ios-chrome-banner {
+      display: none;               /* se muestra solo por JS */
+      background: #fff3cd;
+      color: #8a6d3b;
+      border: 1px solid #ffeeba;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
     /* ENCABEZADO AZUL */
     .app-header {
       background: linear-gradient(135deg, #0052cc, #0b6eff);
@@ -212,6 +225,12 @@
 
   <!-- CONTENIDO PRINCIPAL -->
   <div class="app-container">
+    <!-- BANNER PARA CHROME EN iOS -->
+    <div id="ios-chrome-banner" class="ios-chrome-banner">
+      Para que tu calendario se guarde correctamente, abrí CheckColono en Safari.
+      Desde Chrome, tocá el botón de compartir y elegí <strong>"Abrir en Safari"</strong>.
+    </div>
+
     <!-- CARD CONFIGURACIÓN -->
     <div class="card">
       <!-- QUITÉ EL h1 PARA NO REPETIR CheckColono -->
@@ -421,7 +440,7 @@
       ics += `DTSTAMP:${dtstamp}\r\n`;
       ics += `DTSTART:${start}\r\n`;
       ics += `SUMMARY:${summary}\r\n`;
-      ics += "END:VEVENT\r\n";
+      ics += "END:VEVENT\r\n`;
     });
 
     ics += "END:VCALENDAR\r\n";
@@ -437,6 +456,20 @@
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
+
+  // --------- BANNER PARA CHROME EN iOS ---------
+  (function () {
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    const isChromeIOS = /CriOS/.test(ua); // Chrome en iOS
+
+    if (isIOS && isChromeIOS) {
+      const banner = document.getElementById("ios-chrome-banner");
+      if (banner) {
+        banner.style.display = "block";
+      }
+    }
+  })();
 
   // botón "Generar plan"
   document.getElementById("btn-generar").addEventListener("click", () => {
@@ -458,4 +491,3 @@
 </script>
 </body>
 </html>
-
