@@ -10,50 +10,58 @@
         sans-serif;
       line-height: 1.4;
     }
+
+    /* CAMBIO: apilar en columna header + contenido */
     body {
       margin: 0;
       padding: 0;
       background: #f5f5f7;
       color: #222;
       display: flex;
-      justify-content: center;
+      flex-direction: column;   /* antes solo justify-content */
+      align-items: center;
     }
+
     .app-container {
       max-width: 480px;
       width: 100%;
       padding: 16px;
+      box-sizing: border-box;
     }
 
+    /* ENCABEZADO AZUL */
     .app-header {
-  background: linear-gradient(135deg, #0052cc, #0b6eff);
-  color: #ffffff;
-  padding: 18px 16px 20px;
-  border-radius: 0 0 24px 24px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
-  margin: 0 -16px 16px -16px; /* se extiende un poquito para quedar separado de las cards */
-}
+      background: linear-gradient(135deg, #0052cc, #0b6eff);
+      color: #ffffff;
+      padding: 18px 16px 20px;
+      border-radius: 0 0 24px 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+      width: 100%;              /* ocupa todo el ancho de la pantalla */
+      box-sizing: border-box;
+      margin-bottom: 16px;      /* separación con las cards */
+    }
 
-.app-header-inner {
-  max-width: 480px;
-  margin: 0 auto;
-}
+    .app-header-inner {
+      max-width: 480px;
+      margin: 0 auto;
+    }
 
-.app-header-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0 0 4px 0;
-}
+    .app-header-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 4px 0;
+    }
 
-.app-header-subtitle {
-  font-size: 0.95rem;
-  margin: 0 0 2px 0;
-}
+    .app-header-subtitle {
+      font-size: 0.95rem;
+      margin: 0 0 2px 0;
+    }
 
-.app-header-tagline {
-  font-size: 0.9rem;
-  opacity: 0.9;
-  margin: 0;
-}
+    .app-header-tagline {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      margin: 0;
+    }
 
     .card {
       background: #ffffff;
@@ -193,7 +201,7 @@
   </style>
 </head>
 <body>
-  <body>
+  <!-- ENCABEZADO AZUL -->
   <div class="app-header">
     <div class="app-header-inner">
       <p class="app-header-title">CheckColono</p>
@@ -202,24 +210,11 @@
     </div>
   </div>
 
+  <!-- CONTENIDO PRINCIPAL -->
   <div class="app-container">
     <!-- CARD CONFIGURACIÓN -->
     <div class="card">
-      ...
-    </div>
-
-    <!-- CARD PLAN DE PREPARACIÓN -->
-    <div class="card" id="plan-card" style="display:none;">
-      ...
-    </div>
-  </div>
-</body>
-
-  <div class="app-container">
-    <!-- CARD CONFIGURACIÓN -->
-    <div class="card">
-      <h1>CheckColono</h1>
-
+      <!-- QUITÉ EL h1 PARA NO REPETIR CheckColono -->
       <div class="form-group">
         <label for="regimen">Esquema de preparación</label>
         <select id="regimen">
@@ -382,4 +377,3 @@
   </script>
 </body>
 </html>
-
