@@ -245,135 +245,217 @@
     </div>
   </div>
 
-  <script>
-    // genera un plan de ejemplo a partir de la fecha del estudio
-    function buildExamplePlan(baseDate) {
-      // si no hay fecha elegida, uso hoy a la mañana solo para demo
-      const estudio = baseDate ? new Date(baseDate) : new Date();
+<script>
+  // guardamos el último plan generado para poder exportarlo
+  let currentPlan = [];
 
-      // para ejemplo: resto días/horas a mano
-      const d1 = new Date(estudio.getTime());
-      d1.setDate(d1.getDate() - 3);
-      d1.setHours(9, 0, 0, 0);
+  // genera un plan de ejemplo a partir de la fecha del estudio
+  function buildExamplePlan(baseDate) {
+    // si no hay fecha elegida, uso hoy a la mañana solo para demo
+    const estudio = baseDate ? new Date(baseDate) : new Date();
 
-      const d2 = new Date(estudio.getTime());
-      d2.setDate(d2.getDate() - 1);
-      d2.setHours(9, 0, 0, 0);
+    // para ejemplo: resto días/horas a mano
+    const d1 = new Date(estudio.getTime());
+    d1.setDate(d1.getDate() - 3);
+    d1.setHours(9, 0, 0, 0);
 
-      const d3 = new Date(estudio.getTime());
-      d3.setDate(d3.getDate() - 1);
-      d3.setHours(20, 0, 0, 0);
+    const d2 = new Date(estudio.getTime());
+    d2.setDate(d2.getDate() - 1);
+    d2.setHours(9, 0, 0, 0);
 
-      const d4 = new Date(estudio.getTime());
-      d4.setHours(d4.getHours() - 8);
+    const d3 = new Date(estudio.getTime());
+    d3.setDate(d3.getDate() - 1);
+    d3.setHours(20, 0, 0, 0);
 
-      const d5 = new Date(estudio.getTime());
-      d5.setHours(d5.getHours() - 6);
+    const d4 = new Date(estudio.getTime());
+    d4.setHours(d4.getHours() - 8);
 
-      const d6 = new Date(estudio.getTime());
+    const d5 = new Date(estudio.getTime());
+    d5.setHours(d5.getHours() - 6);
 
-      return [
-        {
-          datetime: d1,
-          textBefore: "Iniciar ",
-          linkText: "dieta baja en residuos",
-          linkHref: "#",
-          textAfter: "."
-        },
-        {
-          datetime: d2,
-          textBefore: "Iniciar ",
-          linkText: "dieta de líquidos claros",
-          linkHref: "#",
-          textAfter: "."
-        },
-        {
-          datetime: d3,
-          text: "Primera dosis de solución de PEG."
-        },
-        {
-          datetime: d4,
-          text: "Iniciar ayuno de sólidos."
-        },
-        {
-          datetime: d5,
-          text: "Segunda dosis de solución de PEG."
-        },
-        {
-          datetime: d6,
-          text: "Presentarse en el centro médico."
+    const d6 = new Date(estudio.getTime());
+
+    return [
+      {
+        datetime: d1,
+        textBefore: "Iniciar ",
+        linkText: "dieta baja en residuos",
+        linkHref: "#",
+        textAfter: "."
+      },
+      {
+        datetime: d2,
+        textBefore: "Iniciar ",
+        linkText: "dieta de líquidos claros",
+        linkHref: "#",
+        textAfter: "."
+      },
+      {
+        datetime: d3,
+        text: "Primera dosis de solución de PEG."
+      },
+      {
+        datetime: d4,
+        text: "Iniciar ayuno de sólidos."
+      },
+      {
+        datetime: d5,
+        text: "Segunda dosis de solución de PEG."
+      },
+      {
+        datetime: d6,
+        text: "Presentarse en el centro médico."
+      }
+    ];
+  }
+
+  function formatDateTime(date) {
+    const dias = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
+    const dia = dias[date.getDay()];
+    const dd = String(date.getDate()).padStart(2, "0");
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const isPM = hours >= 12;
+    let label = isPM ? "p. m." : "a. m.";
+    hours = hours % 12;
+    if (hours === 0) hours = 12;
+
+    return `${dia} ${dd}-${mm}, ${hours}:${minutes} ${label}`;
+  }
+
+  function renderPlan(steps) {
+    const container = document.getElementById("prep-steps");
+    container.innerHTML = "";
+
+    // guardamos el plan actual para el .ics
+    currentPlan = steps;
+
+    steps.forEach(step => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "prep-step";
+
+      const timeEl = document.createElement("div");
+      timeEl.className = "prep-time";
+      timeEl.textContent = formatDateTime(step.datetime);
+
+      const descEl = document.createElement("div");
+      descEl.className = "prep-desc";
+
+      if (step.linkText && step.linkHref) {
+        if (step.textBefore) {
+          descEl.appendChild(document.createTextNode(step.textBefore));
         }
-      ];
-    }
-
-    function formatDateTime(date) {
-      const dias = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
-      const dia = dias[date.getDay()];
-      const dd = String(date.getDate()).padStart(2, "0");
-      const mm = String(date.getMonth() + 1).padStart(2, "0");
-
-      let hours = date.getHours();
-      const minutes = String(date.getMinutes()).padStart(2, "0");
-      const isPM = hours >= 12;
-      let label = isPM ? "p. m." : "a. m.";
-      hours = hours % 12;
-      if (hours === 0) hours = 12;
-
-      return `${dia} ${dd}-${mm}, ${hours}:${minutes} ${label}`;
-    }
-
-    function renderPlan(steps) {
-      const container = document.getElementById("prep-steps");
-      container.innerHTML = "";
-
-      steps.forEach(step => {
-        const wrapper = document.createElement("div");
-        wrapper.className = "prep-step";
-
-        const timeEl = document.createElement("div");
-        timeEl.className = "prep-time";
-        timeEl.textContent = formatDateTime(step.datetime);
-
-        const descEl = document.createElement("div");
-        descEl.className = "prep-desc";
-
-        if (step.linkText && step.linkHref) {
-          if (step.textBefore) {
-            descEl.appendChild(document.createTextNode(step.textBefore));
-          }
-          const a = document.createElement("a");
-          a.href = step.linkHref;
-          a.className = "inline-link";
-          a.textContent = step.linkText;
-          descEl.appendChild(a);
-          if (step.textAfter) {
-            descEl.appendChild(document.createTextNode(step.textAfter));
-          }
-        } else {
-          descEl.textContent = step.text;
+        const a = document.createElement("a");
+        a.href = step.linkHref;
+        a.className = "inline-link";
+        a.textContent = step.linkText;
+        descEl.appendChild(a);
+        if (step.textAfter) {
+          descEl.appendChild(document.createTextNode(step.textAfter));
         }
+      } else {
+        descEl.textContent = step.text;
+      }
 
-        wrapper.appendChild(timeEl);
-        wrapper.appendChild(descEl);
-        container.appendChild(wrapper);
-      });
-
-      document.getElementById("plan-card").style.display = "block";
-    }
-
-    // botón "Generar plan"
-    document.getElementById("btn-generar").addEventListener("click", () => {
-      const fechaEstudio = document.getElementById("procedimiento").value;
-      const plan = buildExamplePlan(fechaEstudio);
-      renderPlan(plan);
-      // opcional: hacer scroll a la card del plan
-      document.getElementById("plan-card").scrollIntoView({ behavior: "smooth" });
+      wrapper.appendChild(timeEl);
+      wrapper.appendChild(descEl);
+      container.appendChild(wrapper);
     });
 
-    // botón .ics (placeholder)
-    document.getElementById("export-ics").addEventListener("click", () => {
-      alert("Acá va la generación del .ics 🙂");
+    document.getElementById("plan-card").style.display = "block";
+  }
+
+  // --------- GENERACIÓN DEL ARCHIVO .ICS ---------
+
+  function pad2(n) {
+    return String(n).padStart(2, "0");
+  }
+
+  function toICSDateTime(date) {
+    const y = date.getFullYear();
+    const m = pad2(date.getMonth() + 1);
+    const d = pad2(date.getDate());
+    const hh = pad2(date.getHours());
+    const mm = pad2(date.getMinutes());
+    const ss = pad2(date.getSeconds());
+    // usamos hora "flotante" local (sin Z ni TZID) para que el calendario
+    // la coloque en la hora seleccionada del usuario
+    return `${y}${m}${d}T${hh}${mm}${ss}`;
+  }
+
+  function escapeICS(text) {
+    return text
+      .replace(/\\/g, "\\\\")
+      .replace(/,/g, "\\,")
+      .replace(/;/g, "\\;")
+      .replace(/\r?\n/g, "\\n");
+  }
+
+  function generateICS(steps) {
+    let ics = "BEGIN:VCALENDAR\r\n" +
+              "VERSION:2.0\r\n" +
+              "PRODID:-//CheckColono//ES\r\n" +
+              "CALSCALE:GREGORIAN\r\n";
+
+    const now = new Date();
+    const dtstamp = toICSDateTime(now);
+
+    steps.forEach((step, index) => {
+      const start = toICSDateTime(step.datetime);
+
+      // armamos el texto completo del evento
+      let summary = "";
+      if (step.linkText) {
+        summary = (step.textBefore || "") + step.linkText + (step.textAfter || "");
+      } else {
+        summary = step.text || "";
+      }
+      summary = escapeICS(summary);
+
+      const uid = `checkcolono-${index}-${+step.datetime}@local`;
+
+      ics += "BEGIN:VEVENT\r\n";
+      ics += `UID:${uid}\r\n`;
+      ics += `DTSTAMP:${dtstamp}\r\n`;
+      ics += `DTSTART:${start}\r\n`;
+      ics += `SUMMARY:${summary}\r\n`;
+      ics += "END:VEVENT\r\n";
     });
-  </script>
+
+    ics += "END:VCALENDAR\r\n";
+
+    // descargamos el archivo
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "checkcolono-plan.ics";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // botón "Generar plan"
+  document.getElementById("btn-generar").addEventListener("click", () => {
+    const fechaEstudio = document.getElementById("procedimiento").value;
+    const plan = buildExamplePlan(fechaEstudio);
+    renderPlan(plan);
+    // opcional: hacer scroll a la card del plan
+    document.getElementById("plan-card").scrollIntoView({ behavior: "smooth" });
+  });
+
+  // botón .ics: ahora genera el archivo real
+  document.getElementById("export-ics").addEventListener("click", () => {
+    if (!currentPlan || currentPlan.length === 0) {
+      alert("Primero generá tu plan para poder exportarlo al calendario.");
+      return;
+    }
+    generateICS(currentPlan);
+  });
+</script>
 </body>
 </html>
+
