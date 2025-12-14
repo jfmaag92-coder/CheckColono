@@ -28,9 +28,8 @@
       box-sizing: border-box;
     }
 
-    .ios-chrome-banner,
-    .timeband-banner,
-    .general-note {
+    /* BANNER PARA CHROME EN iOS */
+    .ios-chrome-banner {
       display: none;
       background: #fff3cd;
       color: #8a6d3b;
@@ -42,19 +41,33 @@
       line-height: 1.4;
     }
 
+    /* BANNER PARA HORARIO FUERA DE FRANJA (aproximación) */
     .timeband-banner {
+      display: none;
       background: #e6f0ff;
       color: #1f3b75;
-      border-color: #cfe0ff;
+      border: 1px solid #cfe0ff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      line-height: 1.4;
     }
 
+    /* NOTA GENERAL AL INICIO DEL PLAN */
     .general-note {
-      display: block;
+      display: none;
       background: #f1f5ff;
       color: #1f3b75;
       border: 1px solid #d6e2ff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      margin: 10px 0 12px 0;
+      line-height: 1.4;
     }
 
+    /* ENCABEZADO AZUL */
     .app-header {
       background: linear-gradient(135deg, #0052cc, #0b6eff);
       color: #ffffff;
@@ -95,6 +108,10 @@
       padding: 20px;
       margin-bottom: 16px;
     }
+    h1, h2 {
+      margin: 0 0 12px 0;
+      font-weight: 600;
+    }
 
     .form-group {
       margin-bottom: 12px;
@@ -128,6 +145,10 @@
       font-size: 1rem;
       cursor: pointer;
       margin-top: 8px;
+    }
+
+    .primary-btn:active {
+      transform: scale(0.98);
     }
 
     .prep-steps {
@@ -175,6 +196,24 @@
       line-height: 1.35;
     }
 
+    /* estilo discreto del link EN LÍNEA */
+    .prep-desc a,
+    .inline-link {
+      display: inline;
+      color: #0066cc;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-weight: 500;
+    }
+
+    .inline-link:hover {
+      opacity: 0.8;
+    }
+
+    .plan-footer {
+      margin-top: 20px;
+    }
+
     .export-btn {
       display: block;
       width: 100%;
@@ -187,10 +226,14 @@
       text-align: center;
       cursor: pointer;
     }
+
+    .export-btn:active {
+      transform: scale(0.98);
+    }
   </style>
 </head>
 <body>
-
+  <!-- ENCABEZADO AZUL -->
   <div class="app-header">
     <div class="app-header-inner">
       <p class="app-header-title">CheckColono</p>
@@ -199,49 +242,379 @@
     </div>
   </div>
 
+  <!-- CONTENIDO PRINCIPAL -->
   <div class="app-container">
-
+    <!-- BANNER PARA CHROME EN iOS -->
     <div id="ios-chrome-banner" class="ios-chrome-banner">
       Para que tu calendario se guarde correctamente, abrí CheckColono en Safari.
+      Desde Chrome, tocá el botón de compartir y elegí <strong>"Abrir en Safari"</strong>.
     </div>
 
+    <!-- BANNER PARA HORARIO FUERA DE FRANJA (aproximación) -->
     <div id="timeband-banner" class="timeband-banner"></div>
 
+    <!-- CARD CONFIGURACIÓN -->
     <div class="card">
       <div class="form-group">
-        <label>Esquema de preparación</label>
+        <label for="regimen">Esquema de preparación</label>
         <select id="regimen">
+          <!-- CAMBIO: sin “por franjas horarias” -->
           <option value="novoprep">Novoprep</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label>Fecha y hora del estudio</label>
+        <label for="procedimiento">Fecha y hora del estudio</label>
         <input type="datetime-local" id="procedimiento">
       </div>
 
-      <button class="primary-btn" id="btn-generar">Generar plan</button>
+      <button class="primary-btn" id="btn-generar">
+        Generar plan
+      </button>
     </div>
 
+    <!-- CARD PLAN DE PREPARACIÓN -->
     <div class="card" id="plan-card" style="display:none;">
       <h2>Tu plan de preparación</h2>
 
-      <div class="general-note">
+      <!-- CAMBIO: nota general sin horario -->
+      <div id="general-note" class="general-note">
         Si presentás náuseas o vómitos durante la preparación, interrumpí 30 minutos y retomá según lo indicado.
       </div>
 
       <div id="prep-steps" class="prep-steps"></div>
 
-      <button class="export-btn" id="export-ics">
-        Exportar plan a calendario (.ics)
-      </button>
+      <div class="plan-footer">
+        <button class="export-btn" id="export-ics">
+          Exportar plan a calendario (.ics)
+        </button>
+      </div>
     </div>
   </div>
 
 <script>
-  // === EL SCRIPT DE LÓGICA Y .ICS QUEDA EXACTAMENTE IGUAL ===
-  // (no lo repito aquí para no introducir errores accidentales)
-</script>
+  // guardamos el último plan generado para poder exportarlo
+  let currentPlan = [];
 
+  // -------------------- PROTOCOLOS (v1: Novoprep por franjas) --------------------
+  const protocols = {
+    novoprep: {
+      label: "Novoprep",
+      timeBands: [
+        {
+          label: "08:00–09:30",
+          from: "08:00",
+          to: "09:30",
+          steps: [
+            { dayOffset: -1, time: "13:00", text: "Almuerzo (última comida sólida antes del examen)." },
+            { dayOffset: -1, time: "19:00", text: "Cena: caldos colados desgrasados + gelatina/helado de agua (no rojo)." },
+            { dayOffset: -1, time: "20:00", text: "Tomar 1 comprimido de Bigetric + 1 sobre de Novoprep (según preparación indicada) y luego líquidos claros." },
+            { dayOffset:  0, time: "04:00", text: "Tomar 1 comprimido de Bigetric + 1 sobre de Novoprep (segunda toma)." },
+            { dayOffset:  0, time: "06:00", text: "Hasta esta hora: líquidos muy claros NO gasificados. Luego ayuno total." },
+            { dayOffset:  0, time: "06:00", text: "Ayuno total de sólidos y líquidos (incluida el agua) desde esta hora." }
+          ]
+        },
+        {
+          label: "09:31–11:30",
+          from: "09:31",
+          to: "11:30",
+          steps: [
+            { dayOffset: -1, time: "13:00", text: "Almuerzo (última comida sólida antes del examen)." },
+            { dayOffset: -1, time: "20:00", text: "Cena: caldos colados desgrasados + gelatina/helado de agua (no rojo)." },
+            { dayOffset: -1, time: "22:00", text: "Tomar 1 comprimido de Bigetric + 1 sobre de Novoprep (según preparación indicada) y luego líquidos claros." },
+            { dayOffset:  0, time: "06:00", text: "Tomar 1 comprimido de Bigetric + 1 sobre de Novoprep (segunda toma)." },
+            { dayOffset:  0, time: "08:00", text: "Hasta esta hora: líquidos muy claros NO gasificados. Luego ayuno total." },
+            { dayOffset:  0, time: "08:00", text: "Ayuno total de sólidos y líquidos (incluida el agua) desde esta hora." }
+          ]
+        },
+        {
+          label: "11:31–15:30",
+          from: "11:31",
+          to: "15:30",
+          steps: [
+            { dayOffset: -1, time: "13:00", text: "Almuerzo (última comida sólida antes del examen)." },
+            { dayOffset: -1, time: "20:00", text: "Cena: caldos colados desgrasados + gelatina/helado de agua (no rojo)." },
+            { dayOffset: -1, time: "23:00", text: "Tomar 1 comprimido de Bigetric + 1 sobre de Novoprep (según preparación indicada) y luego líquidos claros." },
+            { dayOffset:  0, time: "07:00", text: "Tomar 1 comprimido de Bigetric + 1 sobre de Novoprep (segunda toma)." },
+            { dayOffset:  0, time: "10:00", text: "Hasta esta hora: líquidos muy claros NO gasificados. Luego ayuno total." },
+            { dayOffset:  0, time: "10:00", text: "Ayuno total de sólidos y líquidos (incluida el agua) desde esta hora." }
+          ]
+        },
+        {
+          label: "15:31–19:30",
+          from: "15:31",
+          to: "19:30",
+          steps: [
+            { dayOffset: -1, time: "21:00", text: "Cena (última comida sólida antes del examen)." },
+            { dayOffset:  0, time: "07:00", text: "Desayuno: té o café con azúcar o edulcorante, a voluntad." },
+            { dayOffset:  0, time: "08:00", text: "Tomar 1 comprimido de Bigetric + 1 sobre de Novoprep (primera toma) y luego líquidos claros." },
+            { dayOffset:  0, time: "11:00", text: "Tomar 1 comprimido de Bigetric + 1 sobre de Novoprep (segunda toma)." },
+            { dayOffset:  0, time: "13:00", text: "Hasta esta hora: líquidos muy claros NO gasificados. Luego ayuno total." },
+            { dayOffset:  0, time: "13:00", text: "Ayuno total de sólidos y líquidos (incluida el agua) desde esta hora." }
+          ]
+        }
+      ]
+    }
+  };
+
+  // -------------------- UTILIDADES DE HORA/FECHA --------------------
+  function pad2(n) { return String(n).padStart(2, "0"); }
+
+  function parseHHMM(hhmm) {
+    const [h, m] = hhmm.split(":").map(Number);
+    return (h * 60) + m;
+  }
+
+  function setDateWithTime(baseDate, dayOffset, hhmm) {
+    const d = new Date(baseDate.getTime());
+    d.setDate(d.getDate() + dayOffset);
+    const [h, m] = hhmm.split(":").map(Number);
+    d.setHours(h, m, 0, 0);
+    return d;
+  }
+
+  // -------------------- SELECCIÓN DE FRANJA (con aproximación) --------------------
+  function pickTimeBand(protocol, procedureDate) {
+    const t = procedureDate.getHours() * 60 + procedureDate.getMinutes();
+
+    let best = null;
+
+    protocol.timeBands.forEach(b => {
+      const from = parseHHMM(b.from);
+      const to = parseHHMM(b.to);
+
+      const inside = (t >= from && t <= to);
+      const dist = inside ? 0 : Math.min(Math.abs(t - from), Math.abs(t - to));
+
+      if (!best || dist < best.dist) {
+        best = { band: b, dist, inside };
+      }
+    });
+
+    return {
+      band: best.band,
+      approximated: !best.inside
+    };
+  }
+
+  // -------------------- CONSTRUCCIÓN DEL PLAN NOVOPREP --------------------
+  function buildPlanNovoprep(procedureDate) {
+    const protocol = protocols.novoprep;
+    const { band, approximated } = pickTimeBand(protocol, procedureDate);
+
+    // Pasos comunes (3 días previos)
+    const commonSteps = [
+      {
+        datetime: setDateWithTime(procedureDate, -3, "09:00"),
+        textBefore: "Iniciar ",
+        linkText: "dieta baja en residuos",
+        linkHref: "#",
+        textAfter: " (3 días previos)."
+      },
+      {
+        datetime: setDateWithTime(procedureDate, -3, "09:05"),
+        text: "Si estás constipado: agregar laxante según indicación del centro (3 días previos, por la mañana)."
+      },
+      {
+        datetime: setDateWithTime(procedureDate, -3, "09:10"),
+        text: "Suspender suplementos de hierro por boca."
+      }
+    ];
+
+    const bandSteps = band.steps.map(s => ({
+      datetime: setDateWithTime(procedureDate, s.dayOffset, s.time),
+      text: s.text
+    }));
+
+    return {
+      steps: [...commonSteps, ...bandSteps],
+      selectedBandLabel: band.label,
+      approximated
+    };
+  }
+
+  // -------------------- RENDER --------------------
+  function formatDateTime(date) {
+    const dias = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
+    const dia = dias[date.getDay()];
+    const dd = String(date.getDate()).padStart(2, "0");
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const isPM = hours >= 12;
+    let label = isPM ? "p. m." : "a. m.";
+    hours = hours % 12;
+    if (hours === 0) hours = 12;
+
+    return `${dia} ${dd}-${mm}, ${hours}:${minutes} ${label}`;
+  }
+
+  function renderPlan(steps) {
+    const container = document.getElementById("prep-steps");
+    container.innerHTML = "";
+
+    currentPlan = steps;
+
+    steps.forEach(step => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "prep-step";
+
+      const timeEl = document.createElement("div");
+      timeEl.className = "prep-time";
+      timeEl.textContent = formatDateTime(step.datetime);
+
+      const descEl = document.createElement("div");
+      descEl.className = "prep-desc";
+
+      if (step.linkText && step.linkHref) {
+        if (step.textBefore) descEl.appendChild(document.createTextNode(step.textBefore));
+        const a = document.createElement("a");
+        a.href = step.linkHref;
+        a.className = "inline-link";
+        a.textContent = step.linkText;
+        descEl.appendChild(a);
+        if (step.textAfter) descEl.appendChild(document.createTextNode(step.textAfter));
+      } else {
+        descEl.textContent = step.text;
+      }
+
+      wrapper.appendChild(timeEl);
+      wrapper.appendChild(descEl);
+      container.appendChild(wrapper);
+    });
+
+    document.getElementById("plan-card").style.display = "block";
+
+    // mostrar nota general al inicio del plan
+    const note = document.getElementById("general-note");
+    if (note) note.style.display = "block";
+  }
+
+  // -------------------- BANNERS --------------------
+  function showTimebandBannerIfNeeded(approximated, selectedBandLabel) {
+    const el = document.getElementById("timeband-banner");
+    if (!el) return;
+
+    if (!approximated) {
+      el.style.display = "none";
+      el.textContent = "";
+      return;
+    }
+
+    el.innerHTML =
+      `El horario ingresado no coincide exactamente con una franja estándar. ` +
+      `Usamos la franja <strong>${selectedBandLabel}</strong> por ser la más cercana. ` +
+      `Te sugerimos corroborar el horario informado para tu estudio.`;
+    el.style.display = "block";
+  }
+
+  // --------- BANNER PARA CHROME EN iOS ---------
+  (function () {
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    const isChromeIOS = /CriOS/.test(ua);
+
+    if (isIOS && isChromeIOS) {
+      const banner = document.getElementById("ios-chrome-banner");
+      if (banner) banner.style.display = "block";
+    }
+  })();
+
+  // -------------------- GENERACIÓN DEL ARCHIVO .ICS --------------------
+  function toICSDateTime(date) {
+    const y = date.getFullYear();
+    const m = pad2(date.getMonth() + 1);
+    const d = pad2(date.getDate());
+    const hh = pad2(date.getHours());
+    const mm = pad2(date.getMinutes());
+    const ss = pad2(date.getSeconds());
+    return `${y}${m}${d}T${hh}${mm}${ss}`;
+  }
+
+  function escapeICS(text) {
+    return text
+      .replace(/\\/g, "\\\\")
+      .replace(/,/g, "\\,")
+      .replace(/;/g, "\\;")
+      .replace(/\r?\n/g, "\\n");
+  }
+
+  function generateICS(steps) {
+    let ics = "BEGIN:VCALENDAR\r\n" +
+              "VERSION:2.0\r\n" +
+              "PRODID:-//CheckColono//ES\r\n" +
+              "CALSCALE:GREGORIAN\r\n";
+
+    const now = new Date();
+    const dtstamp = toICSDateTime(now);
+
+    steps.forEach((step, index) => {
+      const start = toICSDateTime(step.datetime);
+
+      let summary = "";
+      if (step.linkText) {
+        summary = (step.textBefore || "") + step.linkText + (step.textAfter || "");
+      } else {
+        summary = step.text || "";
+      }
+      summary = escapeICS(summary);
+
+      const uid = `checkcolono-${index}-${+step.datetime}@local`;
+
+      ics += "BEGIN:VEVENT\r\n";
+      ics += `UID:${uid}\r\n`;
+      ics += `DTSTAMP:${dtstamp}\r\n`;
+      ics += `DTSTART:${start}\r\n`;
+      ics += `SUMMARY:${summary}\r\n`;
+      ics += "END:VEVENT\r\n";
+    });
+
+    ics += "END:VCALENDAR\r\n";
+
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "checkcolono-plan.ics";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // -------------------- BOTONES --------------------
+  document.getElementById("btn-generar").addEventListener("click", () => {
+    const fechaEstudio = document.getElementById("procedimiento").value;
+    const regimen = document.getElementById("regimen").value;
+
+    if (!fechaEstudio) {
+      alert("Por favor, ingresá la fecha y hora del estudio.");
+      return;
+    }
+
+    const procedureDate = new Date(fechaEstudio);
+
+    let result;
+    if (regimen === "novoprep") {
+      result = buildPlanNovoprep(procedureDate);
+    } else {
+      result = buildPlanNovoprep(procedureDate);
+    }
+
+    showTimebandBannerIfNeeded(result.approximated, result.selectedBandLabel);
+    renderPlan(result.steps);
+
+    document.getElementById("plan-card").scrollIntoView({ behavior: "smooth" });
+  });
+
+  document.getElementById("export-ics").addEventListener("click", () => {
+    if (!currentPlan || currentPlan.length === 0) {
+      alert("Primero generá tu plan para poder exportarlo al calendario.");
+      return;
+    }
+    generateICS(currentPlan);
+  });
+</script>
 </body>
 </html>
