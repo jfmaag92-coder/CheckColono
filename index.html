@@ -11,14 +11,13 @@
       line-height: 1.4;
     }
 
-    /* CAMBIO: apilar en columna header + contenido */
     body {
       margin: 0;
       padding: 0;
       background: #f5f5f7;
       color: #222;
       display: flex;
-      flex-direction: column;   /* antes solo justify-content */
+      flex-direction: column;
       align-items: center;
     }
 
@@ -31,10 +30,23 @@
 
     /* BANNER PARA CHROME EN iOS */
     .ios-chrome-banner {
-      display: none;               /* se muestra solo por JS */
+      display: none;
       background: #fff3cd;
       color: #8a6d3b;
       border: 1px solid #ffeeba;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    /* BANNER PARA HORARIO FUERA DE FRANJA (aproximación) */
+    .timeband-banner {
+      display: none;
+      background: #e6f0ff;
+      color: #1f3b75;
+      border: 1px solid #cfe0ff;
       border-radius: 12px;
       padding: 10px 12px;
       font-size: 0.85rem;
@@ -49,9 +61,9 @@
       padding: 18px 16px 20px;
       border-radius: 0 0 24px 24px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.18);
-      width: 100%;              /* ocupa todo el ancho de la pantalla */
+      width: 100%;
       box-sizing: border-box;
-      margin-bottom: 16px;      /* separación con las cards */
+      margin-bottom: 16px;
     }
 
     .app-header-inner {
@@ -87,8 +99,6 @@
       margin: 0 0 12px 0;
       font-weight: 600;
     }
-
-    /* ---------- CARD CONFIGURACIÓN ---------- */
 
     .form-group {
       margin-bottom: 12px;
@@ -128,14 +138,11 @@
       transform: scale(0.98);
     }
 
-    /* ---------- PLAN DE PREPARACIÓN ---------- */
-
     .prep-steps {
       margin-top: 8px;
       position: relative;
     }
 
-    /* línea vertical del timeline */
     .prep-steps::before {
       content: "";
       position: absolute;
@@ -152,7 +159,6 @@
       position: relative;
     }
 
-    /* punto azul */
     .prep-step::before {
       content: "";
       position: absolute;
@@ -177,7 +183,6 @@
       line-height: 1.35;
     }
 
-    /* estilo discreto del link EN LÍNEA */
     .prep-desc a,
     .inline-link {
       display: inline;
@@ -231,13 +236,15 @@
       Desde Chrome, tocá el botón de compartir y elegí <strong>"Abrir en Safari"</strong>.
     </div>
 
+    <!-- BANNER PARA HORARIO FUERA DE FRANJA (aproximación) -->
+    <div id="timeband-banner" class="timeband-banner"></div>
+
     <!-- CARD CONFIGURACIÓN -->
     <div class="card">
-      <!-- QUITÉ EL h1 PARA NO REPETIR CheckColono -->
       <div class="form-group">
         <label for="regimen">Esquema de preparación</label>
         <select id="regimen">
-          <option value="peg-dividido">PEG en dosis divididas (ejemplo)</option>
+          <option value="novoprep">Novoprep (por franjas horarias)</option>
         </select>
       </div>
 
@@ -268,66 +275,164 @@
   // guardamos el último plan generado para poder exportarlo
   let currentPlan = [];
 
-  // genera un plan de ejemplo a partir de la fecha del estudio
-  function buildExamplePlan(baseDate) {
-    // si no hay fecha elegida, uso hoy a la mañana solo para demo
-    const estudio = baseDate ? new Date(baseDate) : new Date();
+  // -------------------- PROTOCOLOS (v1: Novoprep por franjas) --------------------
+  // Nota: los pasos "3 días previos" son comunes y el bloque variable depende de la franja horaria.
+  const protocols = {
+    novoprep: {
+      label: "Novoprep",
+      timeBands: [
+        {
+          label: "08:00–09:30",
+          from: "08:00",
+          to: "09:30",
+          steps: [
+            // Día previo
+            { dayOffset: -1, time: "13:00", text: "Almuerzo (última comida sólida antes del examen)." },
+            { dayOffset: -1, time: "19:00", text: "Cena: caldos colados desgrasados + gelatina/helado de agua (no rojo)." },
+            { dayOffset: -1, time: "20:00", text: "Tomar 1 comprimido de Bigetric + 1 sobre de Novoprep (según preparación indicada) y luego líquidos claros." },
+            // Día del estudio
+            { dayOffset:  0, time: "04:00", text: "Tomar 1 comprimido de Bigetric + 1 sobre de Novoprep (segunda toma)." },
+            { dayOffset:  0, time: "06:00", text: "Hasta esta hora: líquidos muy claros NO gasificados. Luego ayuno total." },
+            { dayOffset:  0, time: "06:00", text: "Ayuno total de sólidos y líquidos (incluida el agua) desde esta hora." }
+          ]
+        },
+        {
+          label: "09:31–11:30",
+          from: "09:31",
+          to: "11:30",
+          steps: [
+            { dayOffset: -1, time: "13:00", text: "Almuerzo (última comida sólida antes del examen)." },
+            { dayOffset: -1, time: "20:00", text: "Cena: caldos colados desgrasados + gelatina/helado de agua (no rojo)." },
+            { dayOffset: -1, time: "22:00", text: "Tomar 1 comprimido de Bigetric + 1 sobre de Novoprep (según preparación indicada) y luego líquidos claros." },
+            { dayOffset:  0, time: "06:00", text: "Tomar 1 comprimido de Bigetric + 1 sobre de Novoprep (segunda toma)." },
+            { dayOffset:  0, time: "08:00", text: "Hasta esta hora: líquidos muy claros NO gasificados. Luego ayuno total." },
+            { dayOffset:  0, time: "08:00", text: "Ayuno total de sólidos y líquidos (incluida el agua) desde esta hora." }
+          ]
+        },
+        {
+          label: "11:31–15:30",
+          from: "11:31",
+          to: "15:30",
+          steps: [
+            { dayOffset: -1, time: "13:00", text: "Almuerzo (última comida sólida antes del examen)." },
+            { dayOffset: -1, time: "20:00", text: "Cena: caldos colados desgrasados + gelatina/helado de agua (no rojo)." },
+            { dayOffset: -1, time: "23:00", text: "Tomar 1 comprimido de Bigetric + 1 sobre de Novoprep (según preparación indicada) y luego líquidos claros." },
+            { dayOffset:  0, time: "07:00", text: "Tomar 1 comprimido de Bigetric + 1 sobre de Novoprep (segunda toma)." },
+            { dayOffset:  0, time: "10:00", text: "Hasta esta hora: líquidos muy claros NO gasificados. Luego ayuno total." },
+            { dayOffset:  0, time: "10:00", text: "Ayuno total de sólidos y líquidos (incluida el agua) desde esta hora." }
+          ]
+        },
+        {
+          label: "15:31–19:30",
+          from: "15:31",
+          to: "19:30",
+          steps: [
+            { dayOffset: -1, time: "21:00", text: "Cena (última comida sólida antes del examen)." },
+            { dayOffset:  0, time: "07:00", text: "Desayuno: té o café con azúcar o edulcorante, a voluntad." },
+            { dayOffset:  0, time: "08:00", text: "Tomar 1 comprimido de Bigetric + 1 sobre de Novoprep (primera toma) y luego líquidos claros." },
+            { dayOffset:  0, time: "11:00", text: "Tomar 1 comprimido de Bigetric + 1 sobre de Novoprep (segunda toma)." },
+            { dayOffset:  0, time: "13:00", text: "Hasta esta hora: líquidos muy claros NO gasificados. Luego ayuno total." },
+            { dayOffset:  0, time: "13:00", text: "Ayuno total de sólidos y líquidos (incluida el agua) desde esta hora." }
+          ]
+        }
+      ]
+    }
+  };
 
-    // para ejemplo: resto días/horas a mano
-    const d1 = new Date(estudio.getTime());
-    d1.setDate(d1.getDate() - 3);
-    d1.setHours(9, 0, 0, 0);
+  // -------------------- UTILIDADES DE HORA/FECHA --------------------
+  function pad2(n) { return String(n).padStart(2, "0"); }
 
-    const d2 = new Date(estudio.getTime());
-    d2.setDate(d2.getDate() - 1);
-    d2.setHours(9, 0, 0, 0);
+  function parseHHMM(hhmm) {
+    const [h, m] = hhmm.split(":").map(Number);
+    return (h * 60) + m;
+  }
 
-    const d3 = new Date(estudio.getTime());
-    d3.setDate(d3.getDate() - 1);
-    d3.setHours(20, 0, 0, 0);
+  function minutesToHHMM(mins) {
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return `${pad2(h)}:${pad2(m)}`;
+  }
 
-    const d4 = new Date(estudio.getTime());
-    d4.setHours(d4.getHours() - 8);
+  function setDateWithTime(baseDate, dayOffset, hhmm) {
+    const d = new Date(baseDate.getTime());
+    d.setDate(d.getDate() + dayOffset);
+    const [h, m] = hhmm.split(":").map(Number);
+    d.setHours(h, m, 0, 0);
+    return d;
+  }
 
-    const d5 = new Date(estudio.getTime());
-    d5.setHours(d5.getHours() - 6);
+  // -------------------- SELECCIÓN DE FRANJA (con aproximación) --------------------
+  function pickTimeBand(protocol, procedureDate) {
+    const t = procedureDate.getHours() * 60 + procedureDate.getMinutes();
 
-    const d6 = new Date(estudio.getTime());
+    // Convertimos bandas a minutos y elegimos:
+    // - si está dentro, esa
+    // - si no, la más cercana (distancia a intervalos)
+    let best = null;
 
-    return [
+    protocol.timeBands.forEach(b => {
+      const from = parseHHMM(b.from);
+      const to = parseHHMM(b.to);
+
+      const inside = (t >= from && t <= to);
+      const dist = inside ? 0 : Math.min(Math.abs(t - from), Math.abs(t - to));
+
+      if (!best || dist < best.dist) {
+        best = { band: b, dist, inside };
+      }
+    });
+
+    return {
+      band: best.band,
+      approximated: !best.inside
+    };
+  }
+
+  // -------------------- CONSTRUCCIÓN DEL PLAN NOVOPREP --------------------
+  function buildPlanNovoprep(procedureDate) {
+    const protocol = protocols.novoprep;
+    const { band, approximated } = pickTimeBand(protocol, procedureDate);
+
+    // Pasos comunes (3 días previos)
+    // Los dejamos en formato "acción resumida" (luego llenaremos contenidos/links).
+    const commonSteps = [
       {
-        datetime: d1,
+        datetime: setDateWithTime(procedureDate, -3, "09:00"),
         textBefore: "Iniciar ",
         linkText: "dieta baja en residuos",
         linkHref: "#",
-        textAfter: "."
+        textAfter: " (3 días previos)."
       },
       {
-        datetime: d2,
-        textBefore: "Iniciar ",
-        linkText: "dieta de líquidos claros",
-        linkHref: "#",
-        textAfter: "."
+        datetime: setDateWithTime(procedureDate, -3, "09:05"),
+        text: "Si estás constipado: agregar laxante según indicación del centro (3 días previos, por la mañana)."
       },
       {
-        datetime: d3,
-        text: "Primera dosis de solución de PEG."
-      },
-      {
-        datetime: d4,
-        text: "Iniciar ayuno de sólidos."
-      },
-      {
-        datetime: d5,
-        text: "Segunda dosis de solución de PEG."
-      },
-      {
-        datetime: d6,
-        text: "Presentarse en el centro médico."
+        datetime: setDateWithTime(procedureDate, -3, "09:10"),
+        text: "Suspender suplementos de hierro por boca."
       }
     ];
+
+    // Pasos variables por franja
+    const bandSteps = band.steps.map(s => ({
+      datetime: setDateWithTime(procedureDate, s.dayOffset, s.time),
+      text: s.text
+    }));
+
+    // Tip de tolerancia (común) cerca del día del estudio, sin cambiar protocolo
+    const nauseaTip = {
+      datetime: setDateWithTime(procedureDate, 0, minutesToHHMM(procedureDate.getHours() * 60 + procedureDate.getMinutes())),
+      text: "Si presentás náuseas o vómitos durante la preparación, interrumpí 30 minutos y retomá según lo indicado."
+    };
+
+    return {
+      steps: [...commonSteps, ...bandSteps, nauseaTip],
+      selectedBandLabel: band.label,
+      approximated
+    };
   }
 
+  // -------------------- RENDER (sin cambios de estilo) --------------------
   function formatDateTime(date) {
     const dias = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
     const dia = dias[date.getDay()];
@@ -363,17 +468,13 @@
       descEl.className = "prep-desc";
 
       if (step.linkText && step.linkHref) {
-        if (step.textBefore) {
-          descEl.appendChild(document.createTextNode(step.textBefore));
-        }
+        if (step.textBefore) descEl.appendChild(document.createTextNode(step.textBefore));
         const a = document.createElement("a");
         a.href = step.linkHref;
         a.className = "inline-link";
         a.textContent = step.linkText;
         descEl.appendChild(a);
-        if (step.textAfter) {
-          descEl.appendChild(document.createTextNode(step.textAfter));
-        }
+        if (step.textAfter) descEl.appendChild(document.createTextNode(step.textAfter));
       } else {
         descEl.textContent = step.text;
       }
@@ -386,12 +487,37 @@
     document.getElementById("plan-card").style.display = "block";
   }
 
-  // --------- GENERACIÓN DEL ARCHIVO .ICS ---------
+  // -------------------- BANNERS --------------------
+  function showTimebandBannerIfNeeded(approximated, selectedBandLabel) {
+    const el = document.getElementById("timeband-banner");
+    if (!el) return;
 
-  function pad2(n) {
-    return String(n).padStart(2, "0");
+    if (!approximated) {
+      el.style.display = "none";
+      el.textContent = "";
+      return;
+    }
+
+    el.innerHTML =
+      `El horario ingresado no coincide exactamente con una franja estándar. ` +
+      `Usamos la franja <strong>${selectedBandLabel}</strong> por ser la más cercana. ` +
+      `Te sugerimos corroborar el horario informado para tu estudio.`;
+    el.style.display = "block";
   }
 
+  // --------- BANNER PARA CHROME EN iOS ---------
+  (function () {
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    const isChromeIOS = /CriOS/.test(ua); // Chrome en iOS
+
+    if (isIOS && isChromeIOS) {
+      const banner = document.getElementById("ios-chrome-banner");
+      if (banner) banner.style.display = "block";
+    }
+  })();
+
+  // -------------------- GENERACIÓN DEL ARCHIVO .ICS --------------------
   function toICSDateTime(date) {
     const y = date.getFullYear();
     const m = pad2(date.getMonth() + 1);
@@ -399,8 +525,6 @@
     const hh = pad2(date.getHours());
     const mm = pad2(date.getMinutes());
     const ss = pad2(date.getSeconds());
-    // usamos hora "flotante" local (sin Z ni TZID) para que el calendario
-    // la coloque en la hora seleccionada del usuario
     return `${y}${m}${d}T${hh}${mm}${ss}`;
   }
 
@@ -424,7 +548,6 @@
     steps.forEach((step, index) => {
       const start = toICSDateTime(step.datetime);
 
-      // armamos el texto completo del evento
       let summary = "";
       if (step.linkText) {
         summary = (step.textBefore || "") + step.linkText + (step.textAfter || "");
@@ -440,12 +563,11 @@
       ics += `DTSTAMP:${dtstamp}\r\n`;
       ics += `DTSTART:${start}\r\n`;
       ics += `SUMMARY:${summary}\r\n`;
-      ics += "END:VEVENT\r\n";   // ← aquí estaba el error
+      ics += "END:VEVENT\r\n";
     });
 
     ics += "END:VCALENDAR\r\n";
 
-    // descargamos el archivo
     const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -457,30 +579,32 @@
     URL.revokeObjectURL(url);
   }
 
-  // --------- BANNER PARA CHROME EN iOS ---------
-  (function () {
-    const ua = navigator.userAgent || navigator.vendor || window.opera;
-    const isIOS = /iPad|iPhone|iPod/.test(ua);
-    const isChromeIOS = /CriOS/.test(ua); // Chrome en iOS
-
-    if (isIOS && isChromeIOS) {
-      const banner = document.getElementById("ios-chrome-banner");
-      if (banner) {
-        banner.style.display = "block";
-      }
-    }
-  })();
-
-  // botón "Generar plan"
+  // -------------------- BOTONES --------------------
   document.getElementById("btn-generar").addEventListener("click", () => {
     const fechaEstudio = document.getElementById("procedimiento").value;
-    const plan = buildExamplePlan(fechaEstudio);
-    renderPlan(plan);
-    // opcional: hacer scroll a la card del plan
+    const regimen = document.getElementById("regimen").value;
+
+    if (!fechaEstudio) {
+      alert("Por favor, ingresá la fecha y hora del estudio.");
+      return;
+    }
+
+    const procedureDate = new Date(fechaEstudio);
+
+    let result;
+    if (regimen === "novoprep") {
+      result = buildPlanNovoprep(procedureDate);
+    } else {
+      // fallback: si en el futuro agregás otros, aquí se enruta
+      result = buildPlanNovoprep(procedureDate);
+    }
+
+    showTimebandBannerIfNeeded(result.approximated, result.selectedBandLabel);
+    renderPlan(result.steps);
+
     document.getElementById("plan-card").scrollIntoView({ behavior: "smooth" });
   });
 
-  // botón .ics: ahora genera el archivo real
   document.getElementById("export-ics").addEventListener("click", () => {
     if (!currentPlan || currentPlan.length === 0) {
       alert("Primero generá tu plan para poder exportarlo al calendario.");
@@ -491,5 +615,3 @@
 </script>
 </body>
 </html>
-
-
