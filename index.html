@@ -250,6 +250,58 @@
     }
 
     .export-btn:active { transform: scale(0.98); }
+
+    /* --------- NUEVO: SECCIONES DE INFORMACIÓN (dietas / medicamentos) --------- */
+    .info-details {
+      border: 1px solid #e8ecf6;
+      border-radius: 12px;
+      padding: 12px 12px;
+      margin-top: 10px;
+      background: #fbfcff;
+    }
+
+    .info-details summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #1f3b75;
+      list-style: none;
+    }
+
+    .info-details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .info-details summary::after {
+      content: "▾";
+      float: right;
+      opacity: 0.7;
+    }
+
+    .info-details[open] summary::after {
+      content: "▴";
+    }
+
+    .info-block {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: #222;
+      line-height: 1.35;
+    }
+
+    .info-block h3 {
+      margin: 10px 0 6px 0;
+      font-size: 0.95rem;
+      color: #333;
+    }
+
+    .info-block ul {
+      margin: 6px 0 0 18px;
+      padding: 0;
+    }
+
+    .info-block li {
+      margin: 4px 0;
+    }
   </style>
 </head>
 
@@ -298,6 +350,46 @@
       </div>
 
       <button class="primary-btn" id="btn-generar">Generar plan</button>
+    </div>
+
+    <!-- NUEVO: CARD DE INFORMACIÓN (Dietas / Medicamentos) -->
+    <div class="card" id="info-card">
+      <h2>Información</h2>
+
+      <details class="info-details" id="dieta-baja-residuos">
+        <summary>Dieta baja en residuos</summary>
+        <div class="info-block">
+          <h3>Evitar</h3>
+          <ul>
+            <li>Cereales integrales y salvado (pan integral, granola, arroz integral)</li>
+            <li>Frutas y verduras crudas o con piel/semillas; frutas desecadas</li>
+            <li>Legumbres (lentejas, porotos, garbanzos)</li>
+            <li>Frutos secos y semillas (incluye chía, lino, sésamo)</li>
+          </ul>
+
+          <h3>Se puede consumir</h3>
+          <ul>
+            <li>Harinas refinadas: pan blanco, tostadas, galletitas simples; arroz blanco y pastas simples</li>
+            <li>Proteínas: huevos; carnes magras/pescado bien cocidos</li>
+            <li>Lácteos en cantidades pequeñas</li>
+            <li>Verduras cocidas y coladas</li>
+            <li>Frutas cocidas o en compota sin piel ni semillas</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="info-details" id="medicamentos">
+        <summary>Medicamentos</summary>
+        <div class="info-block">
+          <ul>
+            <li>Si tomás anticoagulantes como Warfarina, Acenocumarol, Rivaroxaban, Dabigatrán o similares, deberás suspenderlos.</li>
+            <li>Si sos diabético y estás medicado con hipoglucemiantes, insulina o tenés insuficiencia renal o cardíaca, deberás consultar previamente a tu médico de cabecera y traer sus indicaciones por escrito.</li>
+            <li>Ciertos medicamentos también usados para la obesidad y/o diabetes retrasan notablemente el tránsito gastrointestinal y aumentan por sí solos el riesgo durante la anestesia. Deberás consultar con tu médico tratante para la suspensión previa al estudio en caso de tomar: Semaglutide (Ozempic), Liraglutide (Saxeneda), Dilaglutide (Trulicity), Tirzepatide (Mounjaro) y otros similares.</li>
+            <li>Las formas orales deben suspenderse tres días antes del estudio.</li>
+            <li>Las aplicaciones semanales deben suspenderse una semana antes o más del día del estudio.</li>
+          </ul>
+        </div>
+      </details>
     </div>
 
     <div class="card" id="plan-card" style="display:none;">
@@ -383,7 +475,7 @@
     el.style.display = "block";
   }
 
-  // NUEVO TEXTO + 9:00 todos los días (-3, -2, -1)
+  // Constipación: recordatorio diario a las 09:05 (-3, -2, -1)
   function buildConstipationSteps(procedureDate) {
     const text = "Tomar 1 sobre de Barex (4,5 g de Polietilenglicol 3350) en un vaso de agua fría";
     return [
@@ -393,21 +485,19 @@
     ];
   }
 
-  // pasos comunes (sin recordatorio de hierro)
+  // pasos comunes
   function buildCommonSteps(procedureDate, isConstipated) {
     const steps = [
       {
         datetime: setDateWithTime(procedureDate, -3, "09:00"),
         textBefore: "Iniciar ",
         linkText: "dieta baja en residuos",
-        linkHref: "#",
+        linkHref: "#dieta-baja-residuos",
         textAfter: " (3 días previos)."
       }
     ];
 
     if (isConstipated) {
-      // Mantengo el mismo horario 09:00: quedarán dos eventos ese día (dieta + Barex),
-      // tal como pediste “todos los días a las 9 hs”.
       steps.push(...buildConstipationSteps(procedureDate));
     }
 
@@ -767,4 +857,3 @@
 </script>
 </body>
 </html>
-
