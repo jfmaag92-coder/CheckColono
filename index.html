@@ -290,7 +290,7 @@
 
       <!-- NUEVO: pregunta constipación (debajo de fecha/hora) -->
       <div class="form-group">
-        <label for="constipado">¿Estás constipado/a? (4 o menos deposiciones por semana)</label>
+        <label for="constipado">¿Sos constipado/a?</label>
         <select id="constipado" class="control">
           <option value="" selected disabled>Seleccioná una opción</option>
           <option value="no">No</option>
@@ -386,7 +386,7 @@
 
   // constipación: dosis diaria 3 días previos por la mañana
   function buildConstipationSteps(procedureDate) {
-    const text = "Tomar 1 sobre de Bárex (Polietilengligol 3350, sobres de 4,5 g) en un vaso de agua fría por día por la mañana";
+    const text = "Si estás constipado, tomar 1 sobre de Bárex (Polietilengligol 3350, sobres de 4,5 g) en un vaso de agua fría por día por la mañana";
     return [
       { datetime: setDateWithTime(procedureDate, -3, "09:05"), text },
       { datetime: setDateWithTime(procedureDate, -2, "09:05"), text },
@@ -408,6 +408,11 @@
 
     if (isConstipated) {
       steps.push(...buildConstipationSteps(procedureDate));
+    }
+
+    steps.push({
+      datetime: setDateWithTime(procedureDate, -3, "09:10"),
+      text: "Suspender suplementos de hierro por boca."
     });
 
     return steps;
@@ -766,5 +771,3 @@
 </script>
 </body>
 </html>
-
-
