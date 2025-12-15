@@ -178,11 +178,14 @@
 
     .primary-btn:active { transform: scale(0.98); }
 
+    /* ---------- PLAN DE PREPARACIÓN (se mantiene; ahora renderizamos en cards agrupadas) ---------- */
+
     .prep-steps {
       margin-top: 8px;
       position: relative;
     }
 
+    /* línea vertical del timeline (queda, aunque ahora usamos cards agrupadas) */
     .prep-steps::before {
       content: "";
       position: absolute;
@@ -191,37 +194,10 @@
       bottom: 4px;
       width: 2px;
       background: #e1e5f0;
+      display: none; /* oculto para que no moleste con el nuevo layout */
     }
 
-    .prep-step {
-      margin-bottom: 16px;
-      padding-left: 28px;
-      position: relative;
-    }
-
-    .prep-step::before {
-      content: "";
-      position: absolute;
-      left: 5px;
-      top: 4px;
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      background: #0b6eff;
-      box-shadow: 0 0 0 3px rgba(11,110,255,0.2);
-    }
-
-    .prep-time {
-      font-size: 0.9rem;
-      color: #666;
-      margin-bottom: 2px;
-    }
-
-    .prep-desc {
-      font-size: 1rem;
-      color: #222;
-      line-height: 1.35;
-    }
+    .prep-step { display: none; } /* ya no se usa en el nuevo render */
 
     .prep-desc a,
     .inline-link {
@@ -251,7 +227,7 @@
 
     .export-btn:active { transform: scale(0.98); }
 
-    /* --------- NUEVO: SECCIONES DE INFORMACIÓN (dietas / medicamentos) --------- */
+    /* --------- SECCIONES DE INFORMACIÓN (dietas / medicamentos) --------- */
     .info-details {
       border: 1px solid #e8ecf6;
       border-radius: 12px;
@@ -267,9 +243,7 @@
       list-style: none;
     }
 
-    .info-details summary::-webkit-details-marker {
-      display: none;
-    }
+    .info-details summary::-webkit-details-marker { display: none; }
 
     .info-details summary::after {
       content: "▾";
@@ -277,9 +251,7 @@
       opacity: 0.7;
     }
 
-    .info-details[open] summary::after {
-      content: "▴";
-    }
+    .info-details[open] summary::after { content: "▴"; }
 
     .info-block {
       margin-top: 10px;
@@ -299,8 +271,61 @@
       padding: 0;
     }
 
-    .info-block li {
-      margin: 4px 0;
+    .info-block li { margin: 4px 0; }
+
+    /* --------- NUEVO: PLAN AGRUPADO POR DÍA + RESUMEN/DETALLE --------- */
+
+    .day-block { margin-bottom: 18px; }
+
+    .day-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #1f3b75;
+      margin: 6px 0 10px 0;
+    }
+
+    .event-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+
+    .event-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      cursor: pointer;
+    }
+
+    .event-time {
+      font-size: 0.85rem;
+      color: #555;
+      min-width: 64px;
+    }
+
+    .event-summary {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #222;
+      flex: 1;
+      margin-left: 8px;
+    }
+
+    .event-toggle {
+      font-size: 0.85rem;
+      color: #0066cc;
+      margin-left: 8px;
+      white-space: nowrap;
+    }
+
+    .event-detail {
+      display: none;
+      margin-top: 8px;
+      font-size: 0.95rem;
+      color: #333;
+      line-height: 1.35;
     }
   </style>
 </head>
@@ -352,7 +377,6 @@
       <button class="primary-btn" id="btn-generar">Generar plan</button>
     </div>
 
-    <!-- NUEVO: CARD DE INFORMACIÓN (Dietas / Medicamentos) -->
     <div class="card" id="info-card">
       <h2>Información</h2>
 
@@ -475,7 +499,6 @@
     el.style.display = "block";
   }
 
-  // Constipación: recordatorio diario a las 09:05 (-3, -2, -1)
   function buildConstipationSteps(procedureDate) {
     const text = "Tomar 1 sobre de Barex (4,5 g de Polietilenglicol 3350) en un vaso de agua fría";
     return [
@@ -485,7 +508,6 @@
     ];
   }
 
-  // pasos comunes
   function buildCommonSteps(procedureDate, isConstipated) {
     const steps = [
       {
@@ -577,115 +599,9 @@
       ]
     },
 
-    barexkit: {
-      label: "Barex Kit",
-      timeBands: [
-        { label: "08:00–09:30", from: "08:00", to: "09:30", steps: [
-          { dayOffset: -1, time: "13:00", text: "Almuerzo: carnes rojas o blancas con arroz o fideos. Postre: gelatina y/o helados de agua (no rojo ni color intenso; ananá o limón). Última comida sólida antes del examen." },
-          { dayOffset: -1, time: "18:00", text: "Cena: caldos colados desgrasados y gelatina o helados de agua (no rojo ni color intenso)." },
-          { dayOffset: -1, time: "19:00", text: "Tomar 4 comprimidos de Bisacodilo (incluidos en el Barex Kit) con un vaso de agua, sin masticarlos. Luego líquidos muy claros NO gasificados en abundancia. No mate, no café. (Gatorade: únicamente manzana)." },
-          { dayOffset: -1, time: "19:10", text: "Preparar Barex: disolver 1 envase en 1 litro (recipiente 1 L). Preparar el segundo envase de la misma manera." },
-          { dayOffset: -1, time: "21:00", text: "Tomar 1 comprimido de Bigetric y comenzar el primer litro de Barex: un vaso grande (~250 cm³) cada 15 minutos hasta completar 1 litro." },
-          { dayOffset:  0, time: "04:00", text: "Tomar 1 comprimido de Bigetric y tomar el segundo litro de Barex: un vaso grande cada 15 minutos hasta completarlo." },
-          { dayOffset:  0, time: "06:00", text: "Ayuno total de sólidos y líquidos, incluido el agua, a partir de esta hora. No chicles ni caramelos." }
-        ]},
-        { label: "09:31–11:30", from: "09:31", to: "11:30", steps: [
-          { dayOffset: -1, time: "13:00", text: "Almuerzo: carnes rojas o blancas con arroz o fideos. Postre: gelatina y/o helados de agua (no rojo ni color intenso; ananá o limón). Última comida sólida antes del examen." },
-          { dayOffset: -1, time: "19:00", text: "Cena: caldos colados desgrasados y gelatina o helados de agua (no rojo ni color intenso)." },
-          { dayOffset: -1, time: "20:00", text: "Tomar 4 comprimidos de Bisacodilo (incluidos en el Barex Kit) con un vaso de agua, sin masticarlos. Luego líquidos muy claros NO gasificados. No mate, no café. (Gatorade: únicamente manzana)." },
-          { dayOffset: -1, time: "20:10", text: "Preparar Barex: disolver 1 envase en 1 litro. Preparar el segundo envase de la misma manera." },
-          { dayOffset: -1, time: "22:00", text: "Tomar 1 comprimido de Bigetric y comenzar el primer litro de Barex: un vaso grande (~250 cm³) cada 15 minutos hasta completar 1 litro." },
-          { dayOffset:  0, time: "06:00", text: "Tomar 1 comprimido de Bigetric y tomar el segundo litro de Barex: un vaso grande cada 15 minutos hasta completarlo." },
-          { dayOffset:  0, time: "08:00", text: "Ayuno total de sólidos y líquidos, incluido el agua, a partir de esta hora. No chicles ni caramelos." }
-        ]},
-        { label: "11:31–15:30", from: "11:31", to: "15:30", steps: [
-          { dayOffset: -1, time: "13:00", text: "Almuerzo: carnes rojas o blancas con arroz o fideos. Postre: gelatina y/o helados de agua (no rojo ni color intenso; ananá o limón). Última comida sólida antes del examen." },
-          { dayOffset: -1, time: "20:00", text: "Cena: caldos colados desgrasados y gelatina o helados de agua (no rojo ni color intenso)." },
-          { dayOffset: -1, time: "21:00", text: "Tomar 4 comprimidos de Bisacodilo (incluidos en el Barex Kit) con un vaso de agua, sin masticarlos. Luego líquidos muy claros NO gasificados. No mate, no café." },
-          { dayOffset: -1, time: "21:10", text: "Preparar Barex: disolver 1 envase en 1 litro. Preparar el segundo envase de la misma manera." },
-          { dayOffset: -1, time: "23:00", text: "Tomar 1 comprimido de Bigetric y comenzar el primer litro de Barex: un vaso grande (~250 cm³) cada 15 minutos hasta completar 1 litro." },
-          { dayOffset:  0, time: "07:00", text: "Tomar 1 comprimido de Bigetric y tomar el segundo litro de Barex: un vaso grande cada 15 minutos hasta completarlo." },
-          { dayOffset:  0, time: "10:00", text: "Ayuno total de sólidos y líquidos, incluido el agua, a partir de esta hora. No chicles ni caramelos." }
-        ]},
-        { label: "15:31–20:00", from: "15:31", to: "20:00", steps: [
-          { dayOffset: -1, time: "21:00", text: "Cena: carnes rojas o blancas con arroz o fideos. Postre: gelatina y/o helados de agua (no rojo ni color intenso; ananá o limón). Última comida sólida antes del examen." },
-          { dayOffset:  0, time: "07:00", text: "Desayuno: té o café con azúcar o edulcorante, a gusto." },
-          { dayOffset:  0, time: "08:00", text: "Tomar 4 comprimidos de Bisacodilo (incluidos en el Barex Kit) con un vaso de agua, sin masticarlos. Luego líquidos muy claros NO gasificados. No mate, no café." },
-          { dayOffset:  0, time: "08:10", text: "Preparar Barex: disolver 1 envase en 1 litro. Preparar el segundo envase de la misma manera." },
-          { dayOffset:  0, time: "09:00", text: "Tomar 1 comprimido de Bigetric y comenzar el primer litro de Barex: un vaso grande (~250 cm³) cada 15 minutos hasta completar 1 litro." },
-          { dayOffset:  0, time: "11:00", text: "Tomar 1 comprimido de Bigetric y tomar el segundo litro de Barex: un vaso grande cada 15 minutos hasta completarlo." },
-          { dayOffset:  0, time: "13:00", text: "Ayuno total de sólidos y líquidos, incluido el agua, a partir de esta hora. No chicles ni caramelos." }
-        ]}
-      ]
-    },
-
-    barexplus: {
-      label: "Barex Plus",
-      timeBands: [
-        { label: "08:00–09:30", from: "08:00", to: "09:30", steps: [
-          { dayOffset: -1, time: "13:00", text: "Almuerzo: carnes rojas o blancas con arroz o fideos. Postre: gelatina y/o helados de agua (no rojo ni color intenso; ananá o limón). Última comida sólida antes del examen." },
-          { dayOffset: -1, time: "19:00", text: "Cena: caldos colados desgrasados y gelatina o helados de agua (no rojo ni color intenso)." },
-          { dayOffset: -1, time: "20:00", text: "Tomar 1 comprimido de Bigetric. Vaciar el sobre rotulado “DOSIS 1” en el vaso. Agregar agua potable hasta la línea (480 ml) y disolver. Beber todo en 30 minutos. Luego llenar el vaso solo con agua hasta la línea y tomarlo en los siguientes 30 minutos." },
-          { dayOffset:  0, time: "04:00", text: "Tomar 1 comprimido de Bigetric. Vaciar los sobres “DOSIS 2A” y “DOSIS 2B” en el vaso. Agregar agua hasta 480 ml y disolver. Beber todo en 30 minutos. Luego llenar el vaso solo con agua hasta la línea y tomarlo en los siguientes 30 minutos." },
-          { dayOffset:  0, time: "06:00", text: "Ayuno total de sólidos y líquidos, incluido el agua, a partir de esta hora. No chicles ni caramelos." }
-        ]},
-        { label: "09:31–11:30", from: "09:31", to: "11:30", steps: [
-          { dayOffset: -1, time: "13:00", text: "Almuerzo: carnes rojas o blancas con arroz o fideos. Postre: gelatina y/o helados de agua (no rojo ni color intenso; ananá o limón). Última comida sólida antes del examen." },
-          { dayOffset: -1, time: "20:00", text: "Cena: caldos colados desgrasados y gelatina o helados de agua (no rojo ni color intenso)." },
-          { dayOffset: -1, time: "22:00", text: "Tomar 1 comprimido de Bigetric. Preparar “DOSIS 1” en vaso (480 ml). Beber todo en 30 minutos. Luego agua hasta la línea y tomar en los siguientes 30 minutos." },
-          { dayOffset:  0, time: "06:00", text: "Tomar 1 comprimido de Bigetric. Preparar “DOSIS 2A” + “DOSIS 2B” en vaso (480 ml). Beber todo en 30 minutos. Luego agua hasta la línea y tomar en los siguientes 30 minutos." },
-          { dayOffset:  0, time: "08:00", text: "Ayuno total de sólidos y líquidos, incluido el agua, a partir de esta hora. No chicles ni caramelos." }
-        ]},
-        { label: "11:31–15:30", from: "11:31", to: "15:30", steps: [
-          { dayOffset: -1, time: "13:00", text: "Almuerzo: carnes rojas o blancas con arroz o fideos. Postre: gelatina y/o helados de agua (no rojo ni color intenso; ananá o limón). Última comida sólida antes del examen." },
-          { dayOffset: -1, time: "20:00", text: "Cena: caldos colados desgrasados y gelatina o helados de agua (no rojo ni color intenso)." },
-          { dayOffset: -1, time: "23:00", text: "Tomar 1 comprimido de Bigetric. Preparar “DOSIS 1” en vaso (480 ml). Beber todo en 30 minutos. Luego agua hasta la línea y tomar en los siguientes 30 minutos." },
-          { dayOffset:  0, time: "07:00", text: "Tomar 1 comprimido de Bigetric. Preparar “DOSIS 2A” + “DOSIS 2B” en vaso (480 ml). Beber todo en 30 minutos. Luego agua hasta la línea y tomar en los siguientes 30 minutos." },
-          { dayOffset:  0, time: "10:00", text: "Ayuno total de sólidos y líquidos, incluido el agua, a partir de esta hora. No chicles ni caramelos." }
-        ]},
-        { label: "15:31–20:00", from: "15:31", to: "20:00", steps: [
-          { dayOffset: -1, time: "21:00", text: "Cena: carnes rojas o blancas con arroz o fideos. Postre: gelatina y/o helados de agua (no rojo ni color intenso; ananá o limón). Última comida sólida antes del examen." },
-          { dayOffset:  0, time: "07:00", text: "Desayuno: té o café con azúcar o edulcorante, a gusto." },
-          { dayOffset:  0, time: "08:00", text: "Tomar 1 comprimido de Bigetric. Preparar “DOSIS 1” en vaso (480 ml). Beber todo en 30 minutos. Luego agua hasta la línea y tomar en los siguientes 30 minutos." },
-          { dayOffset:  0, time: "11:00", text: "Tomar 1 comprimido de Bigetric. Preparar “DOSIS 2A” + “DOSIS 2B” en vaso (480 ml). Beber todo en 30 minutos. Luego agua hasta la línea y tomar en los siguientes 30 minutos." },
-          { dayOffset:  0, time: "13:00", text: "Ayuno total de sólidos y líquidos, incluido el agua, a partir de esta hora. No chicles ni caramelos." }
-        ]}
-      ]
-    },
-
-    sulfodom: {
-      label: "Sulfodom",
-      timeBands: [
-        { label: "08:00–09:30", from: "08:00", to: "09:30", steps: [
-          { dayOffset: -1, time: "13:00", text: "Almuerzo: carnes rojas o blancas con arroz o fideos. Postre: gelatina y/o helados de agua (no rojo ni color intenso; ananá o limón). Última comida sólida antes del examen." },
-          { dayOffset: -1, time: "19:00", text: "Cena: caldos colados desgrasados y gelatina o helados de agua (no rojo ni color intenso)." },
-          { dayOffset: -1, time: "20:00", text: "Tomar 1 comprimido de Bigetric. Diluir 1 frasco de SULFODOM (177 ml) con agua hasta la línea del vaso (480 ml). Tomar todo en 30–60 minutos. Luego tomar 1 litro de agua en 1 hora." },
-          { dayOffset:  0, time: "04:00", text: "Tomar 1 comprimido de Bigetric. Diluir 1 frasco de SULFODOM (177 ml) hasta 480 ml. Tomar todo en 30–60 minutos. Luego tomar 1 litro de agua en 1 hora." },
-          { dayOffset:  0, time: "06:00", text: "Ayuno total de sólidos y líquidos, incluido el agua, a partir de esta hora. No chicles ni caramelos." }
-        ]},
-        { label: "09:31–11:30", from: "09:31", to: "11:30", steps: [
-          { dayOffset: -1, time: "13:00", text: "Almuerzo: carnes rojas o blancas con arroz o fideos. Postre: gelatina y/o helados de agua (no rojo ni color intenso; ananá o limón). Última comida sólida antes del examen." },
-          { dayOffset: -1, time: "20:00", text: "Cena: caldos colados desgrasados y gelatina o helados de agua (no rojo ni color intenso)." },
-          { dayOffset: -1, time: "22:00", text: "Tomar 1 comprimido de Bigetric. Diluir 1 frasco de SULFODOM (177 ml) hasta 480 ml. Tomar todo en 30–60 minutos. Luego tomar 1 litro de agua en 1 hora." },
-          { dayOffset:  0, time: "06:00", text: "Tomar 1 comprimido de Bigetric. Diluir 1 frasco de SULFODOM (177 ml) hasta 480 ml. Tomar todo en 30–60 minutos. Luego tomar 1 litro de agua en 1 hora." },
-          { dayOffset:  0, time: "08:00", text: "Ayuno total de sólidos y líquidos, incluido el agua, a partir de esta hora. No chicles ni caramelos." }
-        ]},
-        { label: "11:31–15:30", from: "11:31", to: "15:30", steps: [
-          { dayOffset: -1, time: "13:00", text: "Almuerzo: carnes rojas o blancas con arroz o fideos. Postre: gelatina y/o helados de agua (no rojo ni color intenso; ananá o limón). Última comida sólida antes del examen." },
-          { dayOffset: -1, time: "20:00", text: "Cena: caldos colados desgrasados y gelatina o helados de agua (no rojo ni color intenso)." },
-          { dayOffset: -1, time: "23:00", text: "Tomar 1 comprimido de Bigetric. Diluir 1 frasco de SULFODOM (177 ml) hasta 480 ml. Tomar todo en 30–60 minutos. Luego tomar 1 litro de agua en 1 hora." },
-          { dayOffset:  0, time: "07:00", text: "Tomar 1 comprimido de Bigetric. Diluir 1 frasco de SULFODOM (177 ml) hasta 480 ml. Tomar todo en 30–60 minutos. Luego tomar 1 litro de agua en 1 hora." },
-          { dayOffset:  0, time: "10:00", text: "Ayuno total de sólidos y líquidos, incluido el agua, a partir de esta hora. No chicles ni caramelos." }
-        ]},
-        { label: "15:31–20:00", from: "15:31", to: "20:00", steps: [
-          { dayOffset: -1, time: "21:00", text: "Cena: carnes rojas o blancas con arroz o fideos. Postre: gelatina y/o helados de agua (no rojo ni color intenso; ananá o limón). Última comida sólida antes del examen." },
-          { dayOffset:  0, time: "07:00", text: "Desayuno: té o café con azúcar o edulcorante, a gusto." },
-          { dayOffset:  0, time: "08:00", text: "Tomar 1 comprimido de Bigetric. Diluir 1 frasco de SULFODOM (177 ml) hasta 480 ml. Tomar todo en 30–60 minutos. Luego tomar 1 litro de agua en 1 hora." },
-          { dayOffset:  0, time: "11:00", text: "Tomar 1 comprimido de Bigetric. Diluir 1 frasco de SULFODOM (177 ml) hasta 480 ml. Tomar todo en 30–60 minutos. Luego tomar 1 litro de agua en 1 hora." },
-          { dayOffset:  0, time: "13:00", text: "Ayuno total de sólidos y líquidos, incluido el agua, a partir de esta hora. No chicles ni caramelos." }
-        ]}
-      ]
-    }
+    barexkit: { label: "Barex Kit", timeBands: [] },
+    barexplus: { label: "Barex Plus", timeBands: [] },
+    sulfodom: { label: "Sulfodom", timeBands: [] }
   };
 
   function buildPlanForRegimen(regimenKey, procedureDate, isConstipated) {
@@ -708,37 +624,100 @@
     };
   }
 
+  // --------- NUEVO RENDER: agrupado por día + resumen/detalle ---------
   function renderPlan(steps) {
     const container = document.getElementById("prep-steps");
     container.innerHTML = "";
     currentPlan = steps;
 
+    const groups = {};
     steps.forEach(step => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "prep-step";
+      const d = step.datetime;
+      const key = `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(step);
+    });
 
-      const timeEl = document.createElement("div");
-      timeEl.className = "prep-time";
-      timeEl.textContent = formatDateTime(step.datetime);
+    Object.keys(groups).sort().forEach(dayKey => {
+      const daySteps = groups[dayKey].slice().sort((a,b) => a.datetime - b.datetime);
+      const d = daySteps[0].datetime;
 
-      const descEl = document.createElement("div");
-      descEl.className = "prep-desc";
+      const dayBlock = document.createElement("div");
+      dayBlock.className = "day-block";
 
-      if (step.linkText && step.linkHref) {
-        if (step.textBefore) descEl.appendChild(document.createTextNode(step.textBefore));
-        const a = document.createElement("a");
-        a.href = step.linkHref;
-        a.className = "inline-link";
-        a.textContent = step.linkText;
-        descEl.appendChild(a);
-        if (step.textAfter) descEl.appendChild(document.createTextNode(step.textAfter));
-      } else {
-        descEl.textContent = step.text;
-      }
+      const dayTitle = document.createElement("div");
+      dayTitle.className = "day-title";
 
-      wrapper.appendChild(timeEl);
-      wrapper.appendChild(descEl);
-      container.appendChild(wrapper);
+      const dias = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+      const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+
+      dayTitle.textContent = `${dias[d.getDay()]} ${d.getDate()} de ${meses[d.getMonth()]}`;
+      dayBlock.appendChild(dayTitle);
+
+      daySteps.forEach(step => {
+        const card = document.createElement("div");
+        card.className = "event-card";
+
+        const header = document.createElement("div");
+        header.className = "event-header";
+
+        const time = document.createElement("div");
+        time.className = "event-time";
+        time.textContent = `${pad2(step.datetime.getHours())}:${pad2(step.datetime.getMinutes())}`;
+
+        let fullText = "";
+        if (step.linkText) {
+          fullText = (step.textBefore || "") + step.linkText + (step.textAfter || "");
+        } else {
+          fullText = step.text || "";
+        }
+
+        // Resumen automático (primera oración si es largo; si no hay punto, corta por longitud)
+        let summaryText = fullText;
+        if (fullText.length > 70) {
+          const firstSentence = fullText.split(".")[0];
+          summaryText = firstSentence ? (firstSentence.trim() + ".") : (fullText.slice(0, 70) + "…");
+        }
+
+        const summary = document.createElement("div");
+        summary.className = "event-summary";
+        summary.textContent = summaryText;
+
+        const toggle = document.createElement("div");
+        toggle.className = "event-toggle";
+        toggle.textContent = "Ver detalle";
+
+        header.appendChild(time);
+        header.appendChild(summary);
+        header.appendChild(toggle);
+
+        const detail = document.createElement("div");
+        detail.className = "event-detail";
+
+        if (step.linkText && step.linkHref) {
+          if (step.textBefore) detail.appendChild(document.createTextNode(step.textBefore));
+          const a = document.createElement("a");
+          a.href = step.linkHref;
+          a.className = "inline-link";
+          a.textContent = step.linkText;
+          detail.appendChild(a);
+          if (step.textAfter) detail.appendChild(document.createTextNode(step.textAfter));
+        } else {
+          detail.textContent = fullText;
+        }
+
+        header.addEventListener("click", () => {
+          const open = detail.style.display === "block";
+          detail.style.display = open ? "none" : "block";
+          toggle.textContent = open ? "Ver detalle" : "Ocultar";
+        });
+
+        card.appendChild(header);
+        card.appendChild(detail);
+        dayBlock.appendChild(card);
+      });
+
+      container.appendChild(dayBlock);
     });
 
     document.getElementById("plan-card").style.display = "block";
@@ -823,18 +802,9 @@
     const fechaEstudio = document.getElementById("procedimiento").value;
     const constipado = document.getElementById("constipado").value;
 
-    if (!regimen) {
-      alert("Por favor, seleccioná tu esquema de preparación.");
-      return;
-    }
-    if (!fechaEstudio) {
-      alert("Por favor, ingresá la fecha y hora del estudio.");
-      return;
-    }
-    if (!constipado) {
-      alert("Por favor, indicá si sos constipado/a.");
-      return;
-    }
+    if (!regimen) { alert("Por favor, seleccioná tu esquema de preparación."); return; }
+    if (!fechaEstudio) { alert("Por favor, ingresá la fecha y hora del estudio."); return; }
+    if (!constipado) { alert("Por favor, indicá si sos constipado/a."); return; }
 
     const procedureDate = new Date(fechaEstudio);
     const isConstipated = (constipado === "si");
