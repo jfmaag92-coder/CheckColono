@@ -288,7 +288,6 @@
         <input type="datetime-local" id="procedimiento" class="control">
       </div>
 
-      <!-- NUEVO: pregunta constipación (debajo de fecha/hora) -->
       <div class="form-group">
         <label for="constipado">¿Sos constipado/a?</label>
         <select id="constipado" class="control">
@@ -384,17 +383,17 @@
     el.style.display = "block";
   }
 
-  // constipación: dosis diaria 3 días previos por la mañana
+  // NUEVO TEXTO + 9:00 todos los días (-3, -2, -1)
   function buildConstipationSteps(procedureDate) {
-    const text = "Si estás constipado, tomar 1 sobre de Bárex (Polietilengligol 3350, sobres de 4,5 g) en un vaso de agua fría por día por la mañana";
+    const text = "Tomar 1 sobre de Barex (4,5 g de Polietilenglicol 3350) en un vaso de agua fría";
     return [
-      { datetime: setDateWithTime(procedureDate, -3, "09:05"), text },
-      { datetime: setDateWithTime(procedureDate, -2, "09:05"), text },
-      { datetime: setDateWithTime(procedureDate, -1, "09:05"), text }
+      { datetime: setDateWithTime(procedureDate, -3, "09:00"), text },
+      { datetime: setDateWithTime(procedureDate, -2, "09:00"), text },
+      { datetime: setDateWithTime(procedureDate, -1, "09:00"), text }
     ];
   }
 
-  // pasos comunes (sin el paso fijo de constipación; ahora depende de la respuesta)
+  // pasos comunes (sin recordatorio de hierro)
   function buildCommonSteps(procedureDate, isConstipated) {
     const steps = [
       {
@@ -407,13 +406,10 @@
     ];
 
     if (isConstipated) {
+      // Mantengo el mismo horario 09:00: quedarán dos eventos ese día (dieta + Barex),
+      // tal como pediste “todos los días a las 9 hs”.
       steps.push(...buildConstipationSteps(procedureDate));
     }
-
-    steps.push({
-      datetime: setDateWithTime(procedureDate, -3, "09:10"),
-      text: "Suspender suplementos de hierro por boca."
-    });
 
     return steps;
   }
@@ -604,10 +600,10 @@
 
   function buildPlanForRegimen(regimenKey, procedureDate, isConstipated) {
     const protocol = protocols[regimenKey];
-    const { band, approximated } = pickTimeBand(protocol, procedureDate);
+    const bandPick = pickTimeBand(protocol, procedureDate);
 
     const commonSteps = buildCommonSteps(procedureDate, isConstipated);
-    const bandSteps = band.steps.map(s => ({
+    const bandSteps = bandPick.band.steps.map(s => ({
       datetime: setDateWithTime(procedureDate, s.dayOffset, s.time),
       text: s.text
     }));
@@ -617,8 +613,8 @@
 
     return {
       steps: [...commonSteps, ...bandSteps, arrivalStep],
-      selectedBandLabel: band.label,
-      approximated
+      selectedBandLabel: bandPick.band.label,
+      approximated: bandPick.approximated
     };
   }
 
