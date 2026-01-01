@@ -310,10 +310,89 @@
       color: #333;
       line-height: 1.35;
     }
+
+    /* =========================
+       SPLASH SCREEN (NUEVO)
+       ========================= */
+    .splash {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #0052cc, #0b6eff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 450ms ease;
+    }
+
+    .splash.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .splash-card {
+      width: min(520px, calc(100% - 48px));
+      border-radius: 22px;
+      padding: 28px 22px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.25);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.22);
+      text-align: center;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .splash-title {
+      margin: 0 0 6px 0;
+      font-size: 2.0rem;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      color: #fff;
+    }
+
+    .splash-sub {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.92);
+    }
+
+    .splash-img {
+      width: 92px;
+      height: 92px;
+      border-radius: 22px;
+      margin: 0 auto 14px auto;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* “ícono” simple por defecto (podés reemplazar por <img>) */
+    .splash-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.85);
+      opacity: 0.9;
+    }
   </style>
 </head>
 
 <body>
+  <!-- SPLASH (NUEVO) -->
+  <div id="splash" class="splash" aria-hidden="true">
+    <div class="splash-card">
+      <div class="splash-img">
+        <div class="splash-mark"></div>
+      </div>
+      <p class="splash-title">CheckColono</p>
+      <p class="splash-sub">Dra. Evelin Crocci</p>
+    </div>
+  </div>
+
   <div class="app-header">
     <div class="app-header-inner">
       <p class="app-header-title">CheckColono</p>
@@ -749,7 +828,6 @@
           fullText = step.text || "";
         }
 
-        // Resumen automático (primera oración si es largo; si no hay punto, corta por longitud)
         let summaryText = fullText;
         if (fullText.length > 70) {
           const firstSentence = fullText.split(".")[0];
@@ -812,6 +890,23 @@
       const banner = document.getElementById("ios-chrome-banner");
       if (banner) banner.style.display = "block";
     }
+  })();
+
+  // SPLASH: ocultar a los ~2.4s con fade
+  (function () {
+    const splash = document.getElementById("splash");
+    if (!splash) return;
+
+    // Permite que pinte primero y luego arranque el timer
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        splash.classList.add("hidden");
+        // remover del DOM al finalizar la transición (para que no quede “encima”)
+        setTimeout(() => {
+          if (splash && splash.parentNode) splash.parentNode.removeChild(splash);
+        }, 520);
+      }, 2400); // 2.4s (ajustable)
+    });
   })();
 
   // .ICS
