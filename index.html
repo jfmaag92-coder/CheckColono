@@ -312,7 +312,7 @@
     }
 
     /* =========================
-       SPLASH SCREEN (NUEVO)
+       SPLASH SCREEN
        ========================= */
     .splash {
       position: fixed;
@@ -322,12 +322,18 @@
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      opacity: 1;
+
+      /* Fade-in/out */
+      opacity: 0;                 /* arranca invisible */
       transition: opacity 450ms ease;
     }
 
+    .splash.show {
+      opacity: 1;                 /* fade-in */
+    }
+
     .splash.hidden {
-      opacity: 0;
+      opacity: 0;                 /* fade-out */
       pointer-events: none;
     }
 
@@ -352,17 +358,24 @@
     }
 
     .splash-tagline{
-      margin: 0 0 8px 0;
+      margin: 0 0 0 0;
       font-size: 0.98rem;
       font-weight: 600;
       color: rgba(255,255,255,0.92);
     }
 
-    .splash-sub {
-      margin: 0;
+    /* Dra. separada (abajo de la pantalla) */
+    .splash-doctor {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 26px;
+      text-align: center;
       font-size: 1.05rem;
       font-weight: 600;
       color: rgba(255,255,255,0.92);
+      padding: 0 18px;
+      box-sizing: border-box;
     }
 
     .splash-img {
@@ -375,31 +388,31 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
     }
 
-    /* “ícono” simple por defecto (podés reemplazar por <img>) */
-    .splash-mark {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.85);
-      opacity: 0.9;
+    /* Imagen real del splash */
+    .splash-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
     }
   </style>
 </head>
 
 <body>
-  <!-- SPLASH (NUEVO) -->
+  <!-- SPLASH -->
   <div id="splash" class="splash" aria-hidden="true">
     <div class="splash-card">
       <div class="splash-img">
-        <div class="splash-mark"></div>
+        <img class="splash-logo" src="assets/splash.png" alt="CheckColono">
       </div>
       <p class="splash-title">CheckColono</p>
       <p class="splash-tagline">Tu aliado en la preparación para tu endoscopía</p>
-      <p class="splash-sub">Dra. Evelin Crocci</p>
-
     </div>
+
+    <div class="splash-doctor">Dra. Evelin Crocci</div>
   </div>
 
   <div class="app-header">
@@ -901,20 +914,25 @@
     }
   })();
 
-  // SPLASH: ocultar a los ~2.4s con fade
+  // SPLASH: fade-in + fade-out y remover del DOM
   (function () {
     const splash = document.getElementById("splash");
     if (!splash) return;
 
-    // Permite que pinte primero y luego arranque el timer
     window.addEventListener("load", () => {
+      // Fade-in (dejar que el browser pinte primero)
+      requestAnimationFrame(() => {
+        splash.classList.add("show");
+      });
+
+      // Espera visible + fade-out
       setTimeout(() => {
         splash.classList.add("hidden");
-        // remover del DOM al finalizar la transición (para que no quede “encima”)
+        // remover del DOM al finalizar la transición
         setTimeout(() => {
           if (splash && splash.parentNode) splash.parentNode.removeChild(splash);
         }, 520);
-      }, 2400); // 2.4s (ajustable)
+      }, 2400); // 2.4s total (ajustable)
     });
   })();
 
@@ -1012,4 +1030,3 @@
 </script>
 </body>
 </html>
-
