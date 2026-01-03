@@ -28,8 +28,44 @@
       box-sizing: border-box;
     }
 
+    .ios-chrome-banner {
+      display: none;
+      background: #fff3cd;
+      color: #8a6d3b;
+      border: 1px solid #ffeeba;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .timeband-banner {
+      display: none;
+      background: #e6f0ff;
+      color: #1f3b75;
+      border: 1px solid #cfe0ff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .general-note {
+      display: none;
+      background: #f1f5ff;
+      color: #1f3b75;
+      border: 1px solid #d6e2ff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      margin: 10px 0 12px 0;
+      line-height: 1.4;
+    }
+
     /* =========================
-       SPLASH SCREEN
+       SPLASH SCREEN (mejorado)
        ========================= */
     .splash {
       position: fixed;
@@ -87,14 +123,22 @@
       overflow: hidden;
 
       opacity: 0;
-      transform: translateY(10px) scale(0.95);
-      transition: all 700ms ease;
+      transform: translateY(10px) scale(0.88);
+      transition:
+        opacity 700ms ease,
+        transform 820ms cubic-bezier(.16,1.15,.25,1);
     }
 
     .splash.show .splash-img {
       opacity: 1;
-      transform: translateY(0) scale(1);
+      transform: translateY(0) scale(1.03);
       transition-delay: 200ms;
+    }
+
+    .splash.show .splash-img.bounced {
+      transform: translateY(0) scale(1);
+      transition-duration: 360ms;
+      transition-timing-function: cubic-bezier(.2,.9,.2,1);
     }
 
     .splash-logo {
@@ -113,7 +157,9 @@
 
       opacity: 0;
       transform: translateY(8px);
-      transition: all 700ms ease;
+      transition:
+        opacity 700ms ease,
+        transform 700ms ease;
     }
 
     .splash.show .splash-title {
@@ -130,7 +176,9 @@
 
       opacity: 0;
       transform: translateY(8px);
-      transition: all 700ms ease;
+      transition:
+        opacity 700ms ease,
+        transform 700ms ease;
     }
 
     .splash.show .splash-tagline {
@@ -148,10 +196,14 @@
       font-size: 1.05rem;
       font-weight: 600;
       color: rgba(255,255,255,0.92);
+      padding: 0 18px;
+      box-sizing: border-box;
 
       opacity: 0;
       transform: translateY(10px);
-      transition: all 700ms ease;
+      transition:
+        opacity 700ms ease,
+        transform 700ms ease;
     }
 
     .splash.show .splash-doctor {
@@ -167,6 +219,8 @@
         transform: none !important;
         filter: none !important;
       }
+      .splash { opacity: 1 !important; }
+      .splash-card, .splash-img, .splash-title, .splash-tagline, .splash-doctor { opacity: 1 !important; }
     }
 
     /* =========================
@@ -195,9 +249,9 @@
     }
 
     .app-header-tagline {
-      font-size: 0.9rem;
-      margin: 0 0 3px 0;
+      font-size: 0.90rem;
       opacity: 0.92;
+      margin: 0 0 3px 0;
     }
 
     .app-header-subtitle {
@@ -206,7 +260,226 @@
       opacity: 0.96;
     }
 
-    /* --- el resto del CSS permanece igual --- */
+    /* =========================
+       CARDS / FORM
+       ========================= */
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    h1, h2 {
+      margin: 0 0 12px 0;
+      font-weight: 600;
+    }
+
+    .form-group { margin-bottom: 12px; }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+      color: #555;
+    }
+
+    .control {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #d0d5e0;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      -webkit-appearance: none;
+      appearance: none;
+      background-color: #fff;
+    }
+
+    input.control {
+      min-height: 44px;
+      height: 44px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+
+    input.control::-webkit-date-and-time-value {
+      min-height: 44px;
+      line-height: 44px;
+    }
+
+    select.control {
+      background-image:
+        linear-gradient(45deg, transparent 50%, #666 50%),
+        linear-gradient(135deg, #666 50%, transparent 50%),
+        linear-gradient(to right, transparent, transparent);
+      background-position:
+        calc(100% - 18px) calc(50% - 3px),
+        calc(100% - 12px) calc(50% - 3px),
+        calc(100% - 2.2rem) 0.5rem;
+      background-size:
+        6px 6px,
+        6px 6px,
+        1px 1.8rem;
+      background-repeat: no-repeat;
+      padding-right: 2.4rem;
+      min-height: 44px;
+      height: 44px;
+    }
+
+    .primary-btn {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: none;
+      background: #007aff;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .primary-btn:active { transform: scale(0.98); }
+
+    /* =========================
+       LINKS
+       ========================= */
+    .prep-steps { margin-top: 8px; position: relative; }
+
+    .prep-desc a,
+    .inline-link {
+      display: inline;
+      color: #0066cc;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-weight: 500;
+    }
+
+    .inline-link:hover { opacity: 0.8; }
+
+    .plan-footer { margin-top: 20px; }
+
+    .export-btn {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: none;
+      background: #e6f0ff;
+      color: #0052cc;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .export-btn:active { transform: scale(0.98); }
+
+    /* =========================
+       INFO DETAILS
+       ========================= */
+    .info-details {
+      border: 1px solid #e8ecf6;
+      border-radius: 12px;
+      padding: 12px 12px;
+      margin-top: 10px;
+      background: #fbfcff;
+    }
+
+    .info-details summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #1f3b75;
+      list-style: none;
+    }
+
+    .info-details summary::-webkit-details-marker { display: none; }
+
+    .info-details summary::after {
+      content: "▾";
+      float: right;
+      opacity: 0.7;
+    }
+
+    .info-details[open] summary::after { content: "▴"; }
+
+    .info-block {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: #222;
+      line-height: 1.35;
+    }
+
+    .info-block h3 {
+      margin: 10px 0 6px 0;
+      font-size: 0.95rem;
+      color: #333;
+    }
+
+    .info-block ul {
+      margin: 6px 0 0 18px;
+      padding: 0;
+    }
+
+    .info-block li { margin: 4px 0; }
+
+    /* =========================
+       PLAN AGRUPADO POR DÍA
+       ========================= */
+    .day-block { margin-bottom: 18px; }
+
+    .day-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #1f3b75;
+      margin: 6px 0 10px 0;
+    }
+
+    .event-card {
+      background: #ffffff;
+      border: 1px solid #e6e9f2;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+
+    .event-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      cursor: pointer;
+    }
+
+    .event-time {
+      font-size: 0.85rem;
+      color: #555;
+      min-width: 64px;
+    }
+
+    .event-summary {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #222;
+      flex: 1;
+      margin-left: 8px;
+    }
+
+    .event-toggle {
+      font-size: 0.85rem;
+      color: #0066cc;
+      margin-left: 8px;
+      white-space: nowrap;
+    }
+
+    .event-detail {
+      display: none;
+      margin-top: 8px;
+      font-size: 0.95rem;
+      color: #333;
+      line-height: 1.35;
+    }
   </style>
 </head>
 
@@ -215,7 +488,7 @@
   <!-- SPLASH -->
   <div id="splash" class="splash" aria-hidden="true">
     <div class="splash-card">
-      <div class="splash-img">
+      <div class="splash-img" id="splashImg">
         <img class="splash-logo" src="assets/splash.png" alt="CheckColono">
       </div>
       <p class="splash-title">CheckColono</p>
@@ -234,30 +507,6 @@
   </div>
 
   <!-- CONTENIDO PRINCIPAL -->
-  <div class="app-container">
-    <!-- (todo el contenido funcional queda exactamente igual al que ya tenías) -->
-  </div>
-
-<script>
-  /* SPLASH CONTROL */
-  (function () {
-    const splash = document.getElementById("splash");
-    if (!splash) return;
-
-    window.addEventListener("load", () => {
-      requestAnimationFrame(() => splash.classList.add("show"));
-
-      setTimeout(() => {
-        splash.classList.add("hidden");
-        setTimeout(() => {
-          if (splash && splash.parentNode) {
-            splash.parentNode.removeChild(splash);
-          }
-        }, 1000);
-      }, 2600);
-    });
-  })();
-
   <div class="app-container">
     <div id="ios-chrome-banner" class="ios-chrome-banner">
       Para que tu calendario se guarde correctamente, abrí CheckColono en Safari.
@@ -743,20 +992,26 @@
     }
   })();
 
-  /* SPLASH: fade-in/out + animación marcada del contenido */
+  /* SPLASH CONTROL (único, sin duplicar) */
   (function () {
     const splash = document.getElementById("splash");
+    const splashImg = document.getElementById("splashImg");
     if (!splash) return;
 
     window.addEventListener("load", () => {
       requestAnimationFrame(() => splash.classList.add("show"));
 
+      // micro-bounce del logo
+      if (splashImg) {
+        setTimeout(() => splashImg.classList.add("bounced"), 900);
+      }
+
       setTimeout(() => {
         splash.classList.add("hidden");
         setTimeout(() => {
           if (splash && splash.parentNode) splash.parentNode.removeChild(splash);
-        }, 720);
-      }, 2400);
+        }, 1000);
+      }, 2600);
     });
   })();
 
